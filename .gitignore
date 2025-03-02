@@ -1,0 +1,21 @@
+# Ignore auxiliary LaTeX files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.lof
+*.lot
+*.log
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Ignore output PDF if you don't want to track it
+*.pdf
+
+# Ignore hidden system files (optional)
+.DS_Store
+Thumbs.db
+
+# Ignore output directory (if used)
+output/
