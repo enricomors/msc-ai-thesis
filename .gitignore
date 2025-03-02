@@ -9,9 +9,7 @@
 *.run.xml
 *.synctex.gz
 *.toc
-
-# Ignore output PDF if you don't want to track it
-*.pdf
+*.out
 
 # Ignore hidden system files (optional)
 .DS_Store

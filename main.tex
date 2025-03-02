@@ -5,39 +5,159 @@
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{hyperref}  % Fixes \href errors
+\usepackage{xurl}      % Allows line breaks in URLs
+\usepackage{booktabs}  % Fixes \toprule, \midrule, \bottomrule errors
+\setlength{\headheight}{14.5pt}  % Fixes fancyhdr warning
 
-
-\usepackage[backend=biber,style=trad-plain, sorting=nty,firstinits=true]{biblatex}
+\usepackage{csquotes} % Recommended for proper quotation handling
+\usepackage[backend=biber, style=numeric, sorting=nty, firstinits=true]{biblatex}
 \addbibresource{biblio.bib}
 
 \setmainfont{Times New Roman}
 \begin{document}
-	
-	\title{Tensor-prolog: a logic programming framework for training neural networks}
-	\topic{Applied Logic Programming}
-	\candidate{John Smith}
-	\supervisor{Prof.~Mario Rossi}
+
+\title{Tensor-prolog: a logic programming framework for training neural networks}
+\topic{Applied Logic Programming}
+\candidate{John Smith}
+\supervisor{Prof.~Mario Rossi}
 %	\cosupervisor{& John Doe, PhD.} % One co-supervisor.
 %	\cosupervisors{& Dott.~Ing.~Luigi Bianchi\\& Dott~Avv.~Lucia Rossi} % More than one co-supervisor.
-	\academicyear{2020-2021}
-	\session{1st}
-	
-	\frontispiece 
-	\dedication{dedicated(X) :- friend(X).}
-	\toc
-	\figstoc
-	\tablestoc
-	\begintext
-	
-	\chapter{Introduction}
-	YOUR THESIS HERE~\cite{wielemaker2012swi,swi}
-	
-	\appendix
-	
-	\printbibliography[heading=bibintoc] % biblatex
+\academicyear{2020-2021}
+\session{1st}
 
+\frontispiece 
+\dedication{dedicated(X) :- friend(X).}
+\toc
+\figstoc
+\tablestoc
+\begintext
+
+\chapter{Introduction}
+
+\section{Background and Rationale}
+
+The adoption of Artificial Intelligence (AI) is growing rapidly, leading to the development of increasingly 
+complex models that demand significant computational resources. This growth results in high carbon emissions, 
+raising concerns about sustainability in AI research and deployment. Consequently, there is a need to monitor and 
+reduce the environmental impact of AI computations.
+
+In this thesis, we investigate the problem of optimizing hardware architecture selection and configuration for AI 
+algorithms while adhering to carbon emission constraints. An existing tool, 
+\href{https://www.sciencedirect.com/science/article/abs/pii/S0950705122005974}{HADA} 
+(HArdware Dimensioning of AI Algorithms), has previously tackled hardware dimensioning considering budget, runtime, 
+and solution quality constraints. Our work extends HADA by integrating carbon emission constraints, introducing the 
+concept of Sustainable Hardware Dimensioning. \cite{wielemaker2012swi}
+
+\chapter{Related Works}
+\section{Carbon Footprint in AI}
+Several studies have addressed the issue of AI’s carbon footprint. Tools like \textbf{Green Algorithms} and 
+\textbf{CodeCarbon} have been developed to estimate and monitor emissions.
+
+\textbf{CodeCarbon} is an open-source tool designed to track the energy consumption of computational resources 
+and estimate the corresponding carbon emissions. The formula used is:
+
+\begin{equation}
+CO2eq = C \times E
+\end{equation}
+
+where:
+\begin{itemize}
+\item \textbf{C} represents the carbon intensity of electricity (kg CO2e per kWh), varying by country and energy mix.
+\item \textbf{E} is the total electricity consumed during computation (kWh).
+\end{itemize}
+
+By monitoring CPU, GPU, and RAM consumption, CodeCarbon estimates the total emissions associated with a computation. 
+It retrieves the carbon intensity based on the geographical location and logs results at user-defined intervals 
+(default: 15 seconds).
+
+Installation:
+\begin{verbatim}
+pip install codecarbon
+\end{verbatim}
+
+\chapter{Metodology}
+
+\section{Empirical Model Learning in HADA}
+
+HADA employs the \textbf{Empirical Model Learning (EML)} paradigm, which integrates \textbf{Machine Learning (ML)} models 
+into an optimization framework. EML involves:
+
+\begin{enumerate}
+\item \textbf{Data Collection}: Running target algorithms under various hyperparameter configurations and hardware settings 
+to collect performance data.
+\item \textbf{Surrogate Model Creation}: Training ML models (e.g., Decision Trees) to approximate the relationship between 
+input configurations and performance metrics (e.g., runtime, memory, carbon emissions).
+\item \textbf{Optimization}: Using the learned models within a combinatorial optimization framework to find the best hardware
+ configuration.
+\end{enumerate}
+
+HADA was originally applied to the \textbf{ANTICIPATE} and \textbf{CONTINGENCY} stochastic algorithms used in energy 
+management. These algorithms compute energy production schedules while minimizing cost and considering uncertainties.
+
+\section{Integration of CodeCarbon in HADA}
+
+To extend HADA for sustainable AI, we integrate CodeCarbon to track emissions in:
+\begin{itemize}
+\item ANTICIPATE and CONTINGENCY algorithms.
+\item MaxFlow Algorithms:
+\begin{itemize}
+\item Boykov-Kolmogorov (BK)
+\item Excess Incremental Breadth First Search (EIBFS)
+\item Hochbaum's Pseudo Flow (HPF)
+\end{itemize}
+\end{itemize}
+
+\chapter{Experimental Analysis}
+
+\section{Benchmarking on Different Hardware Platforms}
+Experiments were conducted on:
+\begin{itemize}
+\item MacBook Pro (2019)
+\item Leonardo Supercomputer (CINECA HPC)
+\end{itemize}
+
+Each algorithm was executed on 30 instances with hyperparameter values ranging from 1 to 100, 
+generating datasets with 6,000 records per algorithm per hardware platform.
+
+\chapter{HADA-as-a-Service}
+
+\section{HADA Web Application}
+Benchmark data was integrated into the HADA web application, requiring:
+\begin{itemize}
+\item Creation of JSON configuration files for each algorithm-hardware combination.
+\item Specification of hyperparameters and performance targets.
+\end{itemize}
+
+Example JSON structure:
+\begin{verbatim}
+{
+"name": "anticipate",
+"HW_ID": "macbook",
+"hyperparams": [
+{"ID": "num_scenarios", "type": "int", "LB": 1, "UB": 100}
+],
+"targets": [
+{"ID": "time", "LB": null, "UB": null},
+{"ID": "memory", "LB": null, "UB": null},
+{"ID": "emissions", "LB": null, "UB": null}
+]
+}
+\end{verbatim}
+
+\chapter{Conclusions}
+
+This work extends HADA by integrating carbon emission constraints, enhancing its applicability 
+for sustainable AI hardware selection. Through experimental benchmarks on laptops and HPC systems, 
+we validated the framework’s ability to balance performance and environmental impact. The web-based prototype 
+enables users to make informed decisions when configuring AI workloads under sustainability constraints.
+
+\appendix
+
+\printbibliography[heading=bibintoc] % biblatex
+
+\acknowledgements
+I'm very grateful to the inventor of the Prolog language, without whom this thesis couldn't exist. I'd also like 
+to acknowledge my advisor Prof. Mario Rossi by tail-recursively acknowledging my advisor.
 	
-	\acknowledgements
-		I'm very grateful to the inventor of the Prolog language, without whom this thesis couldn't exist. I'd also like to acknowledge my advisor Prof. Mario Rossi by tail-recursively acknowledging my advisor.
-		
 \end{document}
