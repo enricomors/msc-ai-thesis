@@ -4,6 +4,7 @@
 \usepackage{ai_bo_thesis}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
+\usepackage{amsmath}   % For equations
 \usepackage{lmodern}
 \usepackage{hyperref}  % Fixes \href errors
 \usepackage{xurl}      % Allows line breaks in URLs
@@ -121,8 +122,17 @@ footprint.
 The growing awareness about AI's Carbon Footprint also motivated the development of dedicated tools and
 methodologies to monitor the carbon footprint of AI workloads. A number of open-source tools and frameworks
 have been created to help practitioners measure the energy consumption and $\mathrm{CO_2}$ emissions of their
-code. Among those tools, there is \textbf{CodeCarbon}, which is the tool we used to expand HADA in this work.
-CodeCarbon is an open-source Python package for tracking the carbon footprint  of computing projects. It 
+code. ML $\mathrm{CO_2}$ Impact (Machine Learning Emissions Calculator), introduced by Lacoste et al. (2019),
+\cite{lacoste2019quantifying} was one of the early tools for estimating emissions from model training. It is a 
+web-based calculator where users input  information about their training run - such as hardware type (CPU/GPU), runtime, 
+cloud provider, and location - and it computes the energy consumed and corresponding carbon emissions. 
+The calculator leverages known power draw profiles of  hardware and regional carbon intensity factors. According to
+\cite{bannour-etal-2021-evaluating}
+the latest incarnation of this tool has evolved under the umbrella of the CodeCarbon initiative, integrating its 
+functionality into CodeCarbon's open-source package.
+    
+\textbf{CodeCarbon} \cite{courty2024codecarbon}, which is the tool we used to expand HADA in this work, 
+is an open-source Python package for tracking the carbon footprint  of computing projects. It 
 integrates into ML code to log the resources used (CPU, GPU, etc.) and estimates the $\mathrm{CO_2}$ emissions
 produced by the workload. Uniquely, CodeCarbon accounts for the location of the computation - using 
 region-specific electricity carbon intensity data - to provide location-dependent emission estimates. 
@@ -131,51 +141,94 @@ This allows developers to see, for instance, that running the same training job 
 The goal is to inform and incentivize researchers and engineers to optimize or relocate their workloads to 
 reduce emissions.
 
-Tools like \textbf{Green Algorithms} and 
-\textbf{CodeCarbon} have been developed to estimate and monitor emissions.
-
-\textbf{CodeCarbon} is an open-source tool designed to track the energy consumption of computational resources 
-and estimate the corresponding carbon emissions. The formula used is:
-
-\begin{equation}
-CO2eq = C \times E
-\end{equation}
-
-where:
-\begin{itemize}
-\item \textbf{C} represents the carbon intensity of electricity (kg CO2e per kWh), varying by country and energy mix.
-\item \textbf{E} is the total electricity consumed during computation (kWh).
-\end{itemize}
-
-By monitoring CPU, GPU, and RAM consumption, CodeCarbon estimates the total emissions associated with a computation. 
-It retrieves the carbon intensity based on the geographical location and logs results at user-defined intervals 
-(default: 15 seconds).
-
-Installation:
-\begin{verbatim}
-pip install codecarbon
-\end{verbatim}
+Cite other works which provides tools to track carbon emissions, e.g. LLMCarbon 
+\cite{faiz2024llmcarbon}.
 
 \chapter{Metodology}
 
 \section{Empirical Model Learning in HADA}
 
-HADA employs the \textbf{Empirical Model Learning (EML)} paradigm, which integrates \textbf{Machine Learning (ML)} models 
-into an optimization framework. EML involves:
+HADA is based on \textbf{Empirical Model Learning (EML)}, \cite{LOMBARDI2017343} a framework allows the integration of ML 
+models within an optimization problem to enable decision making over complex real-world systems. Hardware Dimensioning is
+indeed a complex problem, since knowing the effect of algorithm configuration and Hardware settings on the algorithm performance
+beforehand is not trivial, even for experts. For this reason, formalising this problem to express it as an optimisation problem
+might be infeasible, due to this complexity. The idea is to learn, rather than directly express, the relationships between 
+algorithm performance and HW resources via ML models, based on \textit{empirical} knowledge.
+Broadly speaking, EML deals with solving declarative optimisation models with a complex component, $h$, which represents 
+the relation between variables which can be acted upon (the decision variables, also called \textit{decidables}) $x$ and 
+the \textit{observables} $y$ related to the system considered; 
+the function $h(x)=y$ describes this relationships. As the $h$ component is complex, we cannot 
+optimise directly over it. Hence, we exploit empirical knowledge to build a surrogate model $h_{\theta}$ learned from data, 
+where $\theta$ is the parameter vector. In our case, we would like to learn the relationships between HW requirements and
+AI algorithm performances, which would be very complex to express formally in a suitable model.
 
+We present here the general mathematical formulation of EML:
+
+\begin{align}
+    \min \quad & f(x, y) \label{eq:objective} \\
+    \text{s.t.} \quad & h_{\theta}(x) = y \label{eq:surrogate} \\
+    & g_j(x, y) \quad \forall j \in J \label{eq:constraints} \\
+    & x_i \in D_i \quad \forall x_i \in x \label{eq:domain}
+\end{align}
+
+where $x$ is the decision variables vector (each $x_i$ has its own domain $D_i$) and $y$ is the vector of observed variables.
+ The goal is to minimize the objective function $f(x,y)$, which might depend on both decision and observed variables. Both 
+ decision and observed variables can be subject to a set of constraints $g_j(x,y)$, such as classical inequalities from 
+ Mathematical Programming and combinatorial predicates from Constraint Programming (e.g., global constraints). The function 
+ $h_{\theta}(x)$ represents the approximate behaviour of the complex relation between decision and observed variables, and it 
+ is, in practice, the encoding of a ML model.
+
+The surrogate model $h_{\theta}(x)$ is trained as in the typical Supervised Learning setting; EML requires a training set 
+$\mathcal{S} = (x_i, h(x_i))_{i=1}^{m}$ which is then used to find the parameter vector $\theta$ minimizing a loss function:
+
+\begin{equation}
+    \arg\min_{\theta} \frac{1}{m} \sum_{i=1}^{m} L(h_{\theta}(x_i), y_i^*)
+\end{equation}
+
+where $y_i^*$ are the ground-truth labels (or targets, in case of regression) of each data point in the training set 
+$\mathcal{S}$ and $L$ is the loss function (e.g., $L_1$ or $L_2$ loss for scalar $y$'s).
+
+The way in which HADA works can then be summarized in three main phases:
 \begin{enumerate}
-\item \textbf{Data Collection}: Running target algorithms under various hyperparameter configurations and hardware settings 
-to collect performance data.
-\item \textbf{Surrogate Model Creation}: Training ML models (e.g., Decision Trees) to approximate the relationship between 
-input configurations and performance metrics (e.g., runtime, memory, carbon emissions).
-\item \textbf{Optimization}: Using the learned models within a combinatorial optimization framework to find the best hardware
- configuration.
+    \item \textit{Data Set Collection} - an initial phase to collect the data set by running multiple times the target algorithms, 
+    under different configurations;
+    \item \textit{Surrogate Model Creation} - once a training set is available, a set of ML models is then trained on such data, and 
+    then these models are encoded as a set of variables and constraints following EML paradigm;
+    \item \textit{Optimization} - post the user-defined constraints and objective function on top of the combinatorial structure
+    formed by the encoded ML models and the domain-knowledge constraints, and finally solve the optimization model 
+    (either until an optimal solution or a time limit is reached).
 \end{enumerate}
 
-HADA was originally applied to the \textbf{ANTICIPATE} and \textbf{CONTINGENCY} stochastic algorithms used in energy 
-management. These algorithms compute energy production schedules while minimizing cost and considering uncertainties.
-
 \section{Integration of CodeCarbon in HADA}
+
+The first step to extend HADA with Carfon Intensity is therefore to gather a dataset which includes data about carbon footprint 
+of the algorithms execution. To do so, we can extend the code for running our algorithms with Codecarbon [https://codecarbon.io/], 
+which is a package that enables developers to track emissions of their code, in order to estimate the carbon footprint. 
+The carbon footprint of an algorithm depends on two factors: the energy needed to run it and the pollutants emitted when producing 
+such energy. The former depends on the computing resources used (e.g. number of cores, running time, data centre efficiency) 
+while the latter, called carbon intensity, depends on the location and production methods used (e.g. nuclear, gas or coal). 
+The Carbon Intensity is expressed in terms of carbon dioxide equivalent ($\mathsf{CO_2e}$), and summarises the global warming 
+effect of the Greenhouse Gases (GHG) emitted in the determined timeframe. [Green Algorithms]. The carbon footprint can then 
+be computed with the following formula [Codecarbon docs]:
+
+\begin{equation}
+    \mathsf{C} = \mathsf{E} \times \mathsf{CI}
+\end{equation}
+
+Where:
+
+\begin{itemize}
+    \item $\mathsf{E}$ is the energy consumed by the computational infrastructure: quantified as kilowatt-hours (kWh).
+    \item $\mathsf{CI}$ is the Carbon Intensity of the electricity consumed for computation: quantified as g of \(\mathsf{CO_2e}\) 
+    emitted per kilowatt-hour of electricity.
+\end{itemize}
+
+Codecarbon directly measures the energy consumption of the CPU, GPU and RAM on which the code is executed at intervals of 15 sec 
+(by default, but it can also be modified). It also monitor the duration of code execution to compute the total electricity 
+consumption. Then it retrieves information about the carbon intensity of the electricity in your geographic area based on the 
+location. Carbon Intensity of the consumed electricity is calculated as a weighted average of the emissions from the different
+energy sources that are used to generate electricity, including fossil fuels and renewables. Based on the mix of energy sources 
+in the local grid, this package calculates the Carbon Intensity of the electricity consumed.
 
 To extend HADA for sustainable AI, we integrate CodeCarbon to track emissions in:
 \begin{itemize}
