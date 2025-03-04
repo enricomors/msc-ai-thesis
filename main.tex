@@ -48,10 +48,9 @@ grown by a factor of 4-5x/year since 2010 \cite{epoch2024compute}. This surge in
 spike in energy consumption for AI, and consequently, an higher environmental impact due to $\mathrm{CO_2}$ emissions.
 For instance, for trainining their LLaMA models, Meta AI researchers have estimated a period of approximately 5 months of 
 on $2048$ $\mathrm{A}100$ $80\mathrm{GB}$ GPUs, resulting in a total of $2,638 \mathrm{MWh}$ of energy and a total emission of 
-$1,015$ $\mathrm{tCO_2eq}$. Moreover, training is not the only source of emissions, has also the inference phase has a cost
-in terms of energy, not to talk about the embodied emissions resulting from the manifacturing of Hardware components. 
-The environmental impact of AI thus become a growing concern, with researchers beginning to sistematically reporting energy
-use and consequent $\mathrm{CO_2}$ emissions of their models. 
+$1,015$ $\mathrm{tCO_2eq}$ \cite{touvron2023llama}. Given the widespread application, the steep increase in model size and
+complexity and the crescent energy requirements for AI applications, the Carbon Footprint of AI has become a growing concern
+in the context of the current climate emergency.
 
 In this work, we will explore an approach for addressing the issue of AI sustainability, by means of HADA (HArdware 
 Dimensioning for AI Algorithms), which is a framework that uses ML to learn the relationship between an algorithm 
@@ -73,8 +72,66 @@ The rest of the work is structured as follows:
 \end{itemize}
 
 \chapter{Related Works}
-\section{Carbon Footprint in AI}
-Several studies have addressed the issue of AI’s carbon footprint. Tools like \textbf{Green Algorithms} and 
+
+\section{Sustainability in AI}
+
+The environmental impact of training large AI models is illustrated by recent empirical assessments. 
+Strubell et al. (2019) quantified the CO2 emissions of several NLP models and found that training a big
+transformer with extensive hyperparameter tuning (including neural architecture search) emitted roughly 
+626,000 pounds of $\mathrm{CO_2}$ - about the same as the lifetime emissions of five cars \cite{strubell2019energy}
+\cite{dodge2022carbon}. These findings brought attention to the fact that accuracy gains in AI often come 
+at a steep energy and carbon price. In response, researchers have begun to sistematically reporting energy
+use and consequent $\mathrm{CO_2}$ emissions of model training to raise awareness \cite{dodge2022carbon} 
+\cite{patterson2021carbon}. Beyond individual models, broader studies have examined AI's total energy and 
+environmental footprint across the industry. Henderson et al. (2020) \cite{henderson2020carbon} introduced 
+a framework for tracking real-time energy consumption and carbon emissions during ML experiments, encouraging
+researchers to include these metrics in publications. Their work underscored that transparent reporting 
+is essential for understanding and ultimately reducing AI's climate impacts. Industry-scale analyses also 
+reveal sobering trends. Gupta et al. (2021) \cite{gupta2020carbon} analyzed the end-to-end footprint of 
+computing and found that while operational emissions (from running hardware) have been partly curbed by 
+efficiency improvements, the overall carbon footprint of computing continues to grow due to increased scale. 
+Notably, they showed that for modern data centers and mobile devices, manufacturing and infrastructure 
+(embodied carbon) now account for the majority of emissions. In other words, as data centers adopt cleaner 
+power, the emissions “hidden” in hardware supply chains (chip fabrication, server manufacturing, etc.) 
+become a dominant concern. Similarly, Wu et al. (2022) \cite{wu2021sustainableai} present a holistic study 
+of AI at a large tech company (Meta/Facebook), examining the entire AI model lifecycle - from data processing 
+and training to inference and hardware lifecycle. They report super-linear growth in AI workloads and 
+infrastructure: for instance, daily inference operations doubled over a recent 3-year span, forcing a 2.5x
+expansion in server capacity. Crucially, Wu et al. also highlight that embodied carbon is an increasing 
+fraction of AI's total footprint, echoing that improvements in hardware efficiency alone cannot eliminate
+AI's impact. Their analysis argues for looking beyond training alone - considering data center construction, 
+supply chains, and the frequency of model retraining - to truly grasp AI's environmental impact.
+
+A recurring theme in these studies is the diminishing return on energy investment for AI model improvements.
+As models get larger and more complex, the incremental accuracy gains often require disproportionately more 
+compute (and thus energy). Schwartz et al. (2020) \cite{GreenAI} dub the status quo “Red AI,” where 
+researchers prioritize accuracy at almost any computational cost, and they note this trend is unsustainable 
+both environmentally and even economically. Thompson et al. (2021) \cite{thompson2021deeplearning} similarly
+observed that progress in benchmarks was coming with exponentially increasing computing cost, warning of 
+diminishing returns and calling the situation unsustainable. Another challenge is equitable access: massive 
+energy requirements make cutting-edge AI research expensive, potentially concentrating it in wealthy 
+institutions and regions with robust infrastructure. This raises concerns that AI's growing energy hunger 
+not only harms the planet but also exacerbates inequalities in who can afford to do top-tier research. These 
+concerns have prompted calls for a paradigm shift toward “Green AI”, where efficiency and sustainability are 
+treated as primary goals in model development. Several studies have addressed the issue of AI's carbon 
+footprint. 
+
+\section{Tools for tracking Carbon Emissions}
+
+The growing awareness about AI's Carbon Footprint also motivated the development of dedicated tools and
+methodologies to monitor the carbon footprint of AI workloads. A number of open-source tools and frameworks
+have been created to help practitioners measure the energy consumption and $\mathrm{CO_2}$ emissions of their
+code. Among those tools, there is \textbf{CodeCarbon}, which is the tool we used to expand HADA in this work.
+CodeCarbon is an open-source Python package for tracking the carbon footprint  of computing projects. It 
+integrates into ML code to log the resources used (CPU, GPU, etc.) and estimates the $\mathrm{CO_2}$ emissions
+produced by the workload. Uniquely, CodeCarbon accounts for the location of the computation - using 
+region-specific electricity carbon intensity data - to provide location-dependent emission estimates. 
+This allows developers to see, for instance, that running the same training job on a low-carbon grid 
+(e.g. hydro-powered Montreal) results in a much smaller footprint than running it on a coal-heavy grid. 
+The goal is to inform and incentivize researchers and engineers to optimize or relocate their workloads to 
+reduce emissions.
+
+Tools like \textbf{Green Algorithms} and 
 \textbf{CodeCarbon} have been developed to estimate and monitor emissions.
 
 \textbf{CodeCarbon} is an open-source tool designed to track the energy consumption of computational resources 
