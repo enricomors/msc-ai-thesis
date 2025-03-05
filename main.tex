@@ -56,7 +56,7 @@ in the context of the current climate emergency.
 In this work, we will explore an approach for addressing the issue of AI sustainability, by means of HADA (HArdware 
 Dimensioning for AI Algorithms), which is a framework that uses ML to learn the relationship between an algorithm 
 configuration and performance metrics, like total runtime, solution cost and memory usagem and then uses Optimization to find 
-the best  Hardware architecture and its configuration to run an algorithm under required performances and budget limits
+the best Hardware architecture and its configuration to run an algorithm under required performances and budget limits
 which is the problem known as Hardware Dimensioning \cite{DEFILIPPO2022109199}. What we will do is to extend this framework
 in order to consider also the performance of the algorithms in terms of Energy consumption and Carbon Emissions, so that, 
 ideally, we could find the best Algorithm and Hardware configuration that reduces the Carbon Footprint of computation. We 
@@ -148,19 +148,23 @@ Cite other works which provides tools to track carbon emissions, e.g. LLMCarbon
 
 \section{Empirical Model Learning in HADA}
 
-HADA is based on \textbf{Empirical Model Learning (EML)}, \cite{LOMBARDI2017343} a framework allows the integration of ML 
-models within an optimization problem to enable decision making over complex real-world systems. Hardware Dimensioning is
-indeed a complex problem, since knowing the effect of algorithm configuration and Hardware settings on the algorithm performance
-beforehand is not trivial, even for experts. For this reason, formalising this problem to express it as an optimisation problem
-might be infeasible, due to this complexity. The idea is to learn, rather than directly express, the relationships between 
-algorithm performance and HW resources via ML models, based on \textit{empirical} knowledge.
-Broadly speaking, EML deals with solving declarative optimisation models with a complex component, $h$, which represents 
+As we mentioned in the introduction, the main focus of this work is Hardware Dimensioning, i.e. the problem of finding the right 
+Hardware configuration to run the desired algorithm under required performance and budget limits. More specifically, we are given a 
+target algorithm, and we would like to know what is the optimal settings of Algorithm Hyperparameters and Hardware Architecture to
+run the algorithm under a set of constraints in terms of performance requirements. This is not a trivial problem 
+to model, owing to the complexity of knowing beforehand the performance of an AI algorithm on different HW architectures and 
+evaluating the effect of different HW and algorithm configurations. The idea behind HADA is to integrate the domain knowledge held by experts 
+(time constraints, required solution quality, budget limits) with data-driven models.
+The basis of HADA is the \textbf{Empirical Model Learning (EML)}, \cite{LOMBARDI2017343} framework, which uses Machine Learning (ML) 
+techniques to learn the model of an Optimisation problem. The idea is to learn, rather than directly express, complex relationships
+between algorithm performance and HW resources via ML models, using \textit{empirical} knowledge. These models are then embedded in the optimisation problem. 
+In general, this approach is useful whenever the problem to solve using optimisation is very complex and therefore not trivial 
+to derive a model to describe it. Broadly speaking, EML deals with solving declarative optimisation models with a complex component, $h$, which represents 
 the relation between variables which can be acted upon (the decision variables, also called \textit{decidables}) $x$ and 
 the \textit{observables} $y$ related to the system considered; 
-the function $h(x)=y$ describes this relationships. As the $h$ component is complex, we cannot 
-optimise directly over it. Hence, we exploit empirical knowledge to build a surrogate model $h_{\theta}$ learned from data, 
-where $\theta$ is the parameter vector. In our case, we would like to learn the relationships between HW requirements and
-AI algorithm performances, which would be very complex to express formally in a suitable model.
+the function $h(x)=y$ describes this relationships. Since the $h$ component is complex and we cannot 
+optimise directly over it, we exploit empirical knowledge to build a surrogate model $h_{\theta}$ learned from data, 
+where $\theta$ is the parameter vector. 
 
 We present here the general mathematical formulation of EML:
 
@@ -172,11 +176,11 @@ We present here the general mathematical formulation of EML:
 \end{align}
 
 where $x$ is the decision variables vector (each $x_i$ has its own domain $D_i$) and $y$ is the vector of observed variables.
- The goal is to minimize the objective function $f(x,y)$, which might depend on both decision and observed variables. Both 
- decision and observed variables can be subject to a set of constraints $g_j(x,y)$, such as classical inequalities from 
- Mathematical Programming and combinatorial predicates from Constraint Programming (e.g., global constraints). The function 
- $h_{\theta}(x)$ represents the approximate behaviour of the complex relation between decision and observed variables, and it 
- is, in practice, the encoding of a ML model.
+The goal is to minimize the objective function $f(x,y)$, which might depend on both decision and observed variables. Both 
+decision and observed variables can be subject to a set of constraints $g_j(x,y)$, such as classical inequalities from 
+Mathematical Programming and combinatorial predicates from Constraint Programming (e.g., global constraints). The function 
+$h_{\theta}(x)$ represents the approximate behaviour of the complex relation between decision and observed variables, and it 
+is, in practice, the encoding of a ML model.
 
 The surrogate model $h_{\theta}(x)$ is trained as in the typical Supervised Learning setting; EML requires a training set 
 $\mathcal{S} = (x_i, h(x_i))_{i=1}^{m}$ which is then used to find the parameter vector $\theta$ minimizing a loss function:
@@ -190,26 +194,36 @@ $\mathcal{S}$ and $L$ is the loss function (e.g., $L_1$ or $L_2$ loss for scalar
 
 The way in which HADA works can then be summarized in three main phases:
 \begin{enumerate}
-    \item \textit{Data Set Collection} - an initial phase to collect the data set by running multiple times the target algorithms, 
-    under different configurations;
-    \item \textit{Surrogate Model Creation} - once a training set is available, a set of ML models is then trained on such data, and 
-    then these models are encoded as a set of variables and constraints following EML paradigm;
+    \item \textit{Data Set Collection} - an initial phase to collect the data set $\mathcal{S}$ by running multiple times the target algorithms, 
+    under different configuration. This implies running the algorithms with different configurations on different Hardware platforms;
+    \item \textit{Surrogate Model Creation} - once a training set is available, a set of ML models is then trained on such data. These are the $h_{\theta}$ surrogate models.
+    Then, these models are encoded as a set of variables and constraints following the EML paradigm;
     \item \textit{Optimization} - post the user-defined constraints and objective function on top of the combinatorial structure
     formed by the encoded ML models and the domain-knowledge constraints, and finally solve the optimization model 
     (either until an optimal solution or a time limit is reached).
 \end{enumerate}
 
+In the HADA paper \cite{DEFILIPPO2022109199} is described how they gathered a dataset containing records describing:
+\begin{itemize}
+    \item Algorithm configuration;
+    \item Time required to find a solution;
+    \item Cost of the solution found;
+    \item Average memory used by the algorithm.
+\end{itemize}
+
+Our goal is to extend this data with metrics that will allow us to asses the impact of the Algorithm Configuration and the Hardware
+Architecture on Energy Consumption, and consequently, on the Carbon Footprint of the algorithm.
+
 \section{Integration of CodeCarbon in HADA}
 
 The first step to extend HADA with Carfon Intensity is therefore to gather a dataset which includes data about carbon footprint 
-of the algorithms execution. To do so, we can extend the code for running our algorithms with Codecarbon [https://codecarbon.io/], 
-which is a package that enables developers to track emissions of their code, in order to estimate the carbon footprint. 
-The carbon footprint of an algorithm depends on two factors: the energy needed to run it and the pollutants emitted when producing 
+of the algorithms execution. To do so, we can extend the code for running our algorithms with Codecarbon \cite{courty2024codecarbon}.
+The Carbon Footprint of an algorithm depends on two factors: the energy needed to run it and the pollutants emitted when producing 
 such energy. The former depends on the computing resources used (e.g. number of cores, running time, data centre efficiency) 
 while the latter, called carbon intensity, depends on the location and production methods used (e.g. nuclear, gas or coal). 
 The Carbon Intensity is expressed in terms of carbon dioxide equivalent ($\mathsf{CO_2e}$), and summarises the global warming 
-effect of the Greenhouse Gases (GHG) emitted in the determined timeframe. [Green Algorithms]. The carbon footprint can then 
-be computed with the following formula [Codecarbon docs]:
+effect of the Greenhouse Gases (GHG) emitted in the determined timeframe. [Green Algorithms]. Accordin to [insert codecarbon docs ref], the carbon footprint can then 
+be computed with the following formula:
 
 \begin{equation}
     \mathsf{C} = \mathsf{E} \times \mathsf{CI}
