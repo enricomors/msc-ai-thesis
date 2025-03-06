@@ -141,12 +141,20 @@ This allows developers to see, for instance, that running the same training job 
 The goal is to inform and incentivize researchers and engineers to optimize or relocate their workloads to 
 reduce emissions.
 
-Cite other works which provides tools to track carbon emissions, e.g. LLMCarbon 
-\cite{faiz2024llmcarbon}.
+Considerable work has been done in the field of Large Language Models (LLMs), which are the models that have had the most 
+dramatic growth in complexity and size.
 
+There exists also other works that tried to address not only the emissions resulting from model's training and inference,
+but also those emissions resulting from the manifacturing of the Hardware components, which are \textit{embodied} in the 
+total Carbon Footprint. A work in this direction is \cite{faiz2024llmcarbon}, that provides a model to estimate the total
+emissions of an LLM both in terms of \textit{Operational} Carbon Footprint and \textit{Embodied} Carbon Footprint. This work
+also deploys considerations about the Data Center Energy Efficency - expressed by the Power Usage Efficency (PUE) - and the 
+Carbon Intensity of the Electricity used, reinforcing the observations by CodeCarbon, i.e. that performing the computations
+in places where the energy is cleaner can significantly reduce $\mathrm{CO_2}$ emissions.
+ 
 \chapter{Metodology}
 
-\section{Empirical Model Learning in HADA}
+\section{Empirical Model Learning in HADA} \label{EML-HADA}
 
 As we mentioned in the introduction, the main focus of this work is Hardware Dimensioning, i.e. the problem of finding the right 
 Hardware configuration to run the desired algorithm under required performance and budget limits. More specifically, we are given a 
@@ -195,7 +203,7 @@ $\mathcal{S}$ and $L$ is the loss function (e.g., $L_1$ or $L_2$ loss for scalar
 The way in which HADA works can then be summarized in three main phases:
 \begin{enumerate}
     \item \textit{Data Set Collection} - an initial phase to collect the data set $\mathcal{S}$ by running multiple times the target algorithms, 
-    under different configuration. This implies running the algorithms with different configurations on different Hardware platforms;
+    under different configuration, which we call the \textit{Benchmark} phase. This implies running the algorithms with different configurations on different Hardware platforms;
     \item \textit{Surrogate Model Creation} - once a training set is available, a set of ML models is then trained on such data. These are the $h_{\theta}$ surrogate models.
     Then, these models are encoded as a set of variables and constraints following the EML paradigm;
     \item \textit{Optimization} - post the user-defined constraints and objective function on top of the combinatorial structure
@@ -203,26 +211,18 @@ The way in which HADA works can then be summarized in three main phases:
     (either until an optimal solution or a time limit is reached).
 \end{enumerate}
 
-In the HADA paper \cite{DEFILIPPO2022109199} is described how they gathered a dataset containing records describing:
-\begin{itemize}
-    \item Algorithm configuration;
-    \item Time required to find a solution;
-    \item Cost of the solution found;
-    \item Average memory used by the algorithm.
-\end{itemize}
+The creation of the \textit{Surrogate Model} and the \textit{Optimization} phase are already implemented by the HADA prototype that
+will be presented in chapter 5. Our main goal is then to run a set of algorithms under different configurations, in terms of hyper-parameters and 
+Hardware platform, recording a series of metrics that describe Resource Usage, Energy Consumption and Carbon Emissions (i.e. the Carbon Footprint), which will be
+our targets for the surrogate models. First, we need to understand how the Carbon Footprint of an algorithm is measured.
 
-Our goal is to extend this data with metrics that will allow us to asses the impact of the Algorithm Configuration and the Hardware
-Architecture on Energy Consumption, and consequently, on the Carbon Footprint of the algorithm.
+\section{Carbon Footprint of Computation}
 
-\section{Integration of CodeCarbon in HADA}
-
-The first step to extend HADA with Carfon Intensity is therefore to gather a dataset which includes data about carbon footprint 
-of the algorithms execution. To do so, we can extend the code for running our algorithms with Codecarbon \cite{courty2024codecarbon}.
 The Carbon Footprint of an algorithm depends on two factors: the energy needed to run it and the pollutants emitted when producing 
 such energy. The former depends on the computing resources used (e.g. number of cores, running time, data centre efficiency) 
 while the latter, called carbon intensity, depends on the location and production methods used (e.g. nuclear, gas or coal). 
 The Carbon Intensity is expressed in terms of carbon dioxide equivalent ($\mathsf{CO_2e}$), and summarises the global warming 
-effect of the Greenhouse Gases (GHG) emitted in the determined timeframe. [Green Algorithms]. Accordin to [insert codecarbon docs ref], the carbon footprint can then 
+effect of the Greenhouse Gases (GHG) emitted in the determined timeframe \cite{GreenAlgorithms}. According to \cite{courty2024codecarbon}, the carbon footprint can then 
 be computed with the following formula:
 
 \begin{equation}
@@ -238,34 +238,130 @@ Where:
 \end{itemize}
 
 Codecarbon directly measures the energy consumption of the CPU, GPU and RAM on which the code is executed at intervals of 15 sec 
-(by default, but it can also be modified). It also monitor the duration of code execution to compute the total electricity 
+by default. It also monitor the duration of code execution to compute the total electricity 
 consumption. Then it retrieves information about the carbon intensity of the electricity in your geographic area based on the 
 location. Carbon Intensity of the consumed electricity is calculated as a weighted average of the emissions from the different
-energy sources that are used to generate electricity, including fossil fuels and renewables. Based on the mix of energy sources 
-in the local grid, this package calculates the Carbon Intensity of the electricity consumed.
+energy sources that are used to generate electricity, including fossil fuels and renewables. In CodeCarbon, the fossil fuels coal, 
+petroleum, and natural gas are associated with specific carbon intensities: a known amount of carbon dioxide is emitted for each 
+kilowatt-hour of electricity generated. Renewable or low-carbon fuels include e.g. solar power, hydroelectricity, biomass, geothermal.
+Based on the mix of energy sources in the local grid, this package calculates the Carbon Intensity of the electricity consumed. 
+The sources for Carbon Intensity data can vary depending on the platform and availability. For example, on private infrastructures,
+CodeCarbon uses data from Our World In Data \cite{ember2024carbonintensity}. Figure \ref{fig:carbon_intensity} visualizes data about the Carbon Intensity of each country as of
+2023.
 
-To extend HADA for sustainable AI, we integrate CodeCarbon to track emissions in:
+\begin{figure}
+    \includegraphics[width=\linewidth]{imgs/carbon-intensity-electricity.png}
+    \caption{Carbon intensity of electricity generation, 2023. Source \cite{ember2024carbonintensity}}
+    \label{fig:carbon_intensity}
+\end{figure}
+
+\section{Extending HADA with CodeCarbon}
+
+\subsection{Energy Management Algorithms}
+
+The first step to extend HADA with Carfon Intensity is therefore to gather a dataset which includes data about carbon footprint 
+of the algorithms execution, integrating CodeCarbon in code for running our algorithms. The first two algorithms that were analysed 
+are ANTICIPATE and CONTINGENCY, introduced in \cite{ijcai2019p150} \cite{10.1007/978-3-319-93031-2_8} and used in the HADA paper to present the framework \cite{DEFILIPPO2022109199}.
+These are two Stochastic Algorithms from the energy management system domain, which calculate the amount of energy that must be 
+produced by the energy system to meet the required load, minimising the total energy cost over the daily time horizon and by taking 
+into account the uncertainty. In particular, ANTICIPATE is an online (scenario-based) anticipatory algorithm, while CONTINGENCY 
+is an integrated offline/online algorithm that tackles the uncertainty by building (offline) a pool of solutions to guide an 
+efficient online method. Both these methods are characterized by a parameter that can be changed based on the required constraints
+in terms of time constraint and required solution quality (resp., the number of scenarios for ANTICIPATE, and the number of traces 
+for CONTINGENCY). The goal of HADA is to learn the relationship between this configuration parameter and a series of performance
+metrics which describes the Resource Usage of the Algorithm and the quality of the solution. The dataset used originally in HADA then
+includes the following attributes:
+
 \begin{itemize}
-\item ANTICIPATE and CONTINGENCY algorithms.
-\item MaxFlow Algorithms:
+    \item \verb|nParam|: Value of the algorithm configuration parameter, i.e. \verb|nScenarios| For ANTICIPATE and \verb|nTraces| for CONTINGENCY;
+    \item \verb|time(s)|: Time required to find a solution;
+    \item \verb|sol(keuro)|: Cost of the solution found (expresses solution quality);
+    \item \verb|memAvg(MB)|: Average memory used by the algorithm.
+\end{itemize}
+
+As already mentioned, we would like to extend this work by considering also the algorithm performance in terms of Energy Consumption and
+Carbon Footprint. We then added the following metrics taken from CodeCarbon:
+
+\begin{itemize}
+    \item \verb|emissions|: the total emissions of $\mathsf{CO_2e}$ (kg)
+    \item \verb|emission_rate|: the amount of $\mathsf{CO_2e}$ emissions per second (kg/s);
+    \item \verb|cpu_energy|: the energy consumed by the cpu;
+    \item \verb|ram_energy|: the energy consumed by the ram;
+    \item \verb|tot_energy|: the total energy consumed;
+    \item \verb|country| and \verb|region|: the country and region where the computation took place;
+    \item \verb|cpu_count|: the number of cores.
+\end{itemize}
+
+In addition to these, we also implemented the tracking of the peak memory usage (which we called \verb|memPeak(MB)| in the dataset).
+
+\subsection{Min-Cut/Max-Flow Algorithms}
+
+After ANTICIPATE and CONTINGENCY, that were already included in HADA, we decided that it would be interesting to further extend HADA
+with new algorithms. We opted for a set of algorithms used to solve Minimum Cut/Maximum Flow problems on Graphs, that are used for a4paper
+number of Computer Vision tasks. We reffered to the work of Jensen et al. (2023) \cite{Jensen2023Maxflow}, that offers a review of 
+Min-Cut/Max-Flow state-of-the-art algorithms, evaluated on a large Dataset of Computer Vision problems. In particular, we focused on
+three algorithms:
+
 \begin{itemize}
 \item Boykov-Kolmogorov (BK)
 \item Excess Incremental Breadth First Search (EIBFS)
 \item Hochbaum's Pseudo Flow (HPF)
 \end{itemize}
+
+Accoring to Jensen et al. there are different families of Min-Cut/Max-Flow algorithms. BK belongs to the so called Augmenting Paths (AP)
+family, which is the oldest one, introduced with the Ford-Fulkerson Algorithm \cite{}. Instead, EIBFS and HPF are from the family of the so 
+called \textit{Pseudoflow} algorithms \cite{}. The main differences are the order in which they scan through nodes when looking for an arc 
+connecting two trees in the forest, and how they push flow along the paths.
+
+Differently from ANTICIPATE and CONTINGENCY, these algorithms does not have a configuration parameter. Since these three algorithms can 
+be implemented in different variants, we decided to treat the algorithm's implementation type as a configuration parameter. The variants considered
+are the following:
+
+\begin{itemize}
+    \item For Boykov-Kolmogorov we considered:
+    \begin{itemize}
+        \item The reference implementation (BK);
+        \item The implementation by Jensen et al. (MBK), with several optimisations, such as using indices instead of pointers to reduce memory footprint;
+        \item A second implementation by Jensen et al. (MBK-R) which reorders arcs, so that all outgoing arcs from a node are adjacent in memory.
+    \end{itemize}
+    \item For Excess Incremental Breadth First Search we considered:
+    \begin{itemize}
+        \item A slightly modified version of original algorithm (EIBFS);
+        \item A second version replacing pointers with indices (EIBFS-I);
+        \item A third version without arc reordering (EIBFS-I-NR).
+    \end{itemize}
+    \item For Hochbaum's Pseudo Flow we considered:
+    \begin{itemize}
+        \item Highest label variant, with FIFO buckets (HPF-H-F);
+        \item Highest label variant, with LIFO buckets (HPF-H-L);
+        \item Lowest label variant, with FIFO buckets (HPF-L-F);
+        \item Lowest label variant, with LIFO buckets (HPF-L-L).
+    \end{itemize}
 \end{itemize}
+
+Jensen et al. provided a series of scripts to evaluate the runtime of those algorithms - considering both the initialization time and the time required
+to come up with a solution. In order to monitor our target metrics, we wrapped the algorithms scripts - which are implemented in C++ code - with a Python
+script that implements memory usage tracking and uses CodeCarbon to monitor Energy Usage and Carbon Emissions. Differently from ANTICIPATE and CONTINGENCY
+here we do not take the solution quality into consideration.
 
 \chapter{Experimental Analysis}
 
 \section{Benchmarking on Different Hardware Platforms}
+
+For the benchmark phase, we opted for running the algorithms on different Hardware Platforms, in order to better capture the differences in performance
+when changing the machine on which the algorithm is executed:
+
 Experiments were conducted on:
 \begin{itemize}
-\item MacBook Pro (2019)
-\item Leonardo Supercomputer (CINECA HPC)
+\item A Laptop with [Insert specs](\verb|mbp19|);
+\item A PC with [Insert specs] (\verb|PC|);
+\item An HPC infrastructure, i.e. Leonardo [insert specs] hosted by CINECA (\verb|leonardo|).
 \end{itemize}
 
-Each algorithm was executed on 30 instances with hyperparameter values ranging from 1 to 100, 
-generating datasets with 6,000 records per algorithm per hardware platform.
+ANTICIPATE and CONTINGENCY were executed on 30 instances with hyperparameter values ranging from 1 to 100, 
+generating datasets with 6,000 records per algorithm per hardware platform. 
+
+
 
 \chapter{HADA-as-a-Service}
 
