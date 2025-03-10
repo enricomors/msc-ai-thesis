@@ -9,6 +9,7 @@
 \usepackage{hyperref}  % Fixes \href errors
 \usepackage{xurl}      % Allows line breaks in URLs
 \usepackage{booktabs}  % Fixes \toprule, \midrule, \bottomrule errors
+\usepackage{multirow}
 \setlength{\headheight}{14.5pt}  % Fixes fancyhdr warning
 
 \usepackage{csquotes} % Recommended for proper quotation handling
@@ -357,8 +358,8 @@ Experiments were conducted on:
     \begin{itemize}
         \item 1,4 GHz Quad-Core Intel Core i5;
         \item 8 GB 2133 MHz LPDDR3;
-    \end{itemize};
-\item \verb|PC|: An PC with 
+    \end{itemize}
+\item \verb|PC|: A PC with Ubuntu 22.0.4 LTS
 \item \verb|leonardo| An HPC infrastructure, i.e. Leonardo hosted by CINECA. It has a total of 4992 computing nodes organized in two partitions, the Booster partition and the Data Centric General Purpose (DCGP) partition. For running the benchmark phase we used the booster partition, which has the following specifics:
     \begin{itemize}
         \item 8×64 GB DDR4 3200 MHz (512 GB)
@@ -373,7 +374,18 @@ used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a datase
 
 Here we can see some results given by the HADA framework tested on the updated dataset
 
-
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ccc|ccc}
+        \toprule
+        \textbf{Time bound (sec)} & \textbf{Cost (keuro)} & \textbf{memAvg (MB)} & \textbf{nScenarios} & \textbf{Hardware} & \textbf{CO2e(kg)} \\
+        \midrule
+        $42$ & no & no & 1 & mbp19 & $7.23 \times 10^{-6}$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Experimental results for the anticipate algorithm with bounds on the runtime}
+    \label{tab:anticipate_results}
+\end{table}
 
 \chapter{HADA-as-a-Service}
 
