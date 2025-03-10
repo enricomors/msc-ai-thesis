@@ -10,6 +10,9 @@
 \usepackage{xurl}      % Allows line breaks in URLs
 \usepackage{booktabs}  % Fixes \toprule, \midrule, \bottomrule errors
 \usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \setlength{\headheight}{14.5pt}  % Fixes fancyhdr warning
 
 \usepackage{csquotes} % Recommended for proper quotation handling
@@ -372,9 +375,41 @@ ANTICIPATE and CONTINGENCY were executed on 30 instances which were sampled with
 On each instance, each algorithm was executed with parameter (i.e. number of traces or scenarios) values ranging from 1 to 100. For ANTICIPATE and CONTINGENCY we
 used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a dataset with a total of $30 \times 100 \times 2 \times 2 = 12,000$ entries.
 
-Here we can see some results given by the HADA framework tested on the updated dataset
+% MEMORY USAGE 
 
-\begin{table}[h]
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/avg_mem_usage.png}
+    \caption{Average memory usage of ANTICIPATE and CONTINGENCY divided by platform}
+    \label{fig:avg_mem_usage}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/peak_mem_usage.png}
+    \caption{Peak memory usage of ANTICIPATE and CONTINGENCY divided by platform}
+    \label{fig:peak_mem_usage}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/ant_cont_corr_mat.png}
+    \caption{Correlation matrix for ANTICIPATE and CONTINGENCY}
+    \label{fig:ant_cont_corr_mat}
+\end{figure}
+
+As we can see in \ref{fig:ant_cont_corr_mat}, the average and peak memory usage has the highest correlation with the Carbon Emissions of the algorithms. In particular
+memAvg has a positive correlation of $0.87$, and memPeak of $0.69$. As we could expect, these two metrics are highly correlated with one another, with a score of $.80$.
+Then, totEnergy has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions, as measured
+by CodeCarbon, depends by two factors, i.e. the energy consumed by running the algorithm and the Carbon Intensity. Since we executed all the experiments in the same
+country, the Carbon Intensity over the whole dataset is fixed, meaning that the only factor influencing the CO2e emissions is the energy consumed, while the Carbon Intensity
+is just a scaling factor. Lastly, we can also point out that the factor which has the most impact on the solution cost (and thus the quality), is the average memory,
+having a negative correlation of $-0.47$.
+
+Here we can see some results given by the HADA framework tested on the updated dataset for ANTICIPATE and CONTINGENCY. We test some combination of constraints 
+on Runtime, Solution cost, and average Memory consumption (in MB), with the objective of minimizing the CO2e emissions (in kg).
+
+\begin{table}[h!]
     \centering
     \begin{tabular}{ccc|ccc}
         \toprule

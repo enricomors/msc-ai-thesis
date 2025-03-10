@@ -10,6 +10,7 @@
 *.synctex.gz
 *.toc
 *.out
+*.bbl-SAVE-ERROR
 
 # Ignore hidden system files (optional)
 .DS_Store
