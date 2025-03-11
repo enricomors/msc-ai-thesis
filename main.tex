@@ -381,28 +381,45 @@ used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a datase
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/avg_mem_usage.png}
     \caption{Average memory usage of ANTICIPATE and CONTINGENCY divided by platform}
-    \label{fig:avg_mem_usage}
+    \label{fig:ant_cont_avg_mem_usage}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/peak_mem_usage.png}
     \caption{Peak memory usage of ANTICIPATE and CONTINGENCY divided by platform}
-    \label{fig:peak_mem_usage}
+    \label{fig:ant_cont_peak_mem_usage}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/ant_cont_corr_mat.png}
-    \caption{Correlation matrix for ANTICIPATE and CONTINGENCY}
-    \label{fig:ant_cont_corr_mat}
+    \includegraphics[width=0.8\textwidth]{imgs/ant_corr_mat.png}
+    \caption{Correlation matrix for ANTICIPATE}
+    \label{fig:ant_corr_mat}
 \end{figure}
 
-% TODO: Remove the outliers to better check the distribution of Emissions and Energy Consumptions
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/cont_corr_mat.png}
+    \caption{Correlation matrix for CONTINGENCY}
+    \label{fig:ant_corr_mat}
+\end{figure}
 
-% TODO: explore the relationship between other metrics, e.g. check the correlations of cpu energy and ram energy with other variables (even if it should be almost the same as the totEnergy)
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/CO2_emissions_no_outliers.png}
+    \caption{CO2 emissions for ANTICIPATE and CONGINGENCY ordered by platform}
+    \label{fig:ant_cont_co2_emissions}
+\end{figure}
 
-As we can see in \ref{fig:ant_cont_corr_mat}, the average and peak memory usage has the highest correlation with the Carbon Emissions of the algorithms. In particular
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/energy_consumption_no_outliers.png}
+    \caption{Energy Consumption data for ANTICIPATE and CONTINGENCY}
+    \label{fig:ant_cont_energy}
+\end{figure}
+
+As we can see in [old matrix], the average and peak memory usage has the highest correlation with the Carbon Emissions of the algorithms. In particular
 memAvg has a positive correlation of $0.87$, and memPeak of $0.69$. As we could expect, these two metrics are highly correlated with one another, with a score of $.80$.
 Then, \verb|totEnergy| has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions, as measured
 by CodeCarbon, depends by two factors, i.e. the energy consumed by running the algorithm and the Carbon Intensity. Since we executed all the experiments in the same
@@ -420,9 +437,9 @@ as low as possible is the best choice, while increasing them brings the solution
 
 \begin{table}[h!]
     \centering
-    \begin{tabular}{c|ccc}
+    \begin{tabular}{|c|ccc|}
         \hline
-        \multicolumn{1}{c|}{Objective} & \multicolumn{3}{c}{Solution} \\
+        \multicolumn{1}{|c|}{Objective} & \multicolumn{3}{c|}{Solution} \\
         \hline
         Target & $n^P$ & HW & Value \\
         \hline
@@ -430,15 +447,35 @@ as low as possible is the best choice, while increasing them brings the solution
         Cost (€) & 97 & mbp19 & $267.39k$ \\
         Time (s)& 1 & mbp19 & $1.24$ \\
         Avg. Memory (MB) & 1 & mbp19 & $81.47$ \\
-        Peak Memory (MB) & 2 & $92.19$ \\
-        Energy (kW) & 1 & $2.12$ \\
+        Peak Memory (MB) & 2 & mpb19 & $92.19$ \\
+        Energy (kW) & 1 & mbp19 & $2.12$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the ANTICIPATE algorithm with bounds on the runtime}
+    \caption{Minimum values for each target for the ANTICIPATE algorithm}
     \label{tab:anticipate_min_targets}
 \end{table}
 
 % TODO: check minimum values of other metrics too
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|ccc|}
+        \hline
+        \multicolumn{1}{|c|}{Objective} & \multicolumn{3}{c|}{Solution} \\
+        \hline
+        Target & $n^P$ & HW & Value \\
+        \hline
+        CO2e (kg) & 2 & mbp19 & $1.28 \times 10^{6}$ \\
+        Cost (€) & 90 & mbp19 & $314.11k$ \\
+        Time (s)& 1 & mbp19 & $5.16$ \\
+        Avg. Memory (MB) & 1 & mbp19 & $117.66$ \\
+        Peak Memory (MB) & 2 & mbp19 & $130.58$ \\
+        Energy (kW) & 2 & mbp19 & $3.77 \times 10^{-6}$ \\
+        \hline
+    \end{tabular}
+    \caption{Minimum values for each target for the CONTINGENCY algorithm}
+    \label{tab:contingency_min_targets}
+\end{table}
 
 In \ref{tab:anticipate_results} we can see some the results of some combination of constraints on Solution cost (which is
 expressed €), and Average Memory consumption (expressed in MB), with the objective of minimizing the CO2e 
@@ -447,9 +484,9 @@ given algorithm.
 
 \begin{table}[h!]
     \centering
-    \begin{tabular}{cc|ccccc}
+    \begin{tabular}{|cc|ccccc|}
         \hline
-        \multicolumn{2}{c|}{Bounds} & \multicolumn{5}{c}{Solution} \\
+        \multicolumn{2}{|c|}{Bounds} & \multicolumn{5}{c|}{Solution} \\
         \hline
         Memory & Cost & $n^P$ & HW & CO2e & Memory & Cost \\
         \hline
@@ -471,9 +508,9 @@ We'll now see some experiments on CONTINGENCY.
 
 \begin{table}[h!]
     \centering
-    \begin{tabular}{cc|ccccc}
+    \begin{tabular}{|cc|ccccc|}
         \hline
-        \multicolumn{2}{c|}{Bounds} & \multicolumn{5}{c}{Solution} \\
+        \multicolumn{2}{|c|}{Bounds} & \multicolumn{5}{c|}{Solution} \\
         \hline
         Memory & Cost & $n^P$ & HW & CO2e & Memory & Cost \\
         \hline

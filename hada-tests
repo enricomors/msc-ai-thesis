@@ -1,5 +1,5 @@
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"anticipate",
+{"algorithm":"contingency",
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
@@ -18,7 +18,7 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"anticipate",
+{"algorithm":"contingency",
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
@@ -36,7 +36,7 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"anticipate",
+{"algorithm":"contingency",
 "objective": {"target":"sol(keuro)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
@@ -54,7 +54,7 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"anticipate",
+{"algorithm":"contingency",
 "objective": {"target":"totEnergy(kW)", "type": "min"},
 "robustness_fact": null,
 "constraints": [],
