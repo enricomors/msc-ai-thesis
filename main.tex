@@ -408,10 +408,36 @@ the energy consumption values from the dataset, and just keep the emissions. How
 the possibility of evaluating the impact of changing the location of the computations, as we will see later on.
 Lastly, regarding the solution cost (which is inversely proportional to the solution quality), we can point out that the factor which has the most impact on it is the average memory,
 having a negative correlation of $-0.47$. Between the solution cost and the emissions, the correlation is a bit weaker, being $-0.36$. We could then perform some tests with HADA
-to asses the impact of constraints on memory and solution quality on the carbon emissions and viceversa. 
+to asses the impact of constraints on memory and solution quality on the carbon emissions and viceversa.
 
-Here we can see some results given by the HADA framework tested on the updated dataset for ANTICIPATE and CONTINGENCY. We test some combination of constraints 
-on Solution cost (which is expressed in thousands of euros), and Average Memory consumption (expressed in MB), with the objective of minimizing the CO2e emissions (in kg).
+Here we can see some results given by the HADA framework tested on the updated dataset for ANTICIPATE and CONTINGENCY. \ref{tab:anticipate_results}
+presents the results of optimising any target without any constraints for ANTICIPATE. We can notice how, for most metrics keeping the number of scenarios
+as low as possible is the best choice, while increasing them brings the solution cost down.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{c|ccc}
+        \hline
+        \multicolumn{1}{c|}{Objective} & \multicolumn{3}{c}{Solution} \\
+        \hline
+        Target & $n^P$ & HW & Value \\
+        \hline
+        CO2e (kg) & 1 & mbp19 & $7.23 \times 10^{-6}$ \\
+        Cost (€) & 97 & mbp19 & $267.39k$ \\
+        Time (s)& 1 & mbp19 & $1.24$ \\
+        Avg. Memory (MB) & 1 & mbp19 & $81.47$ \\
+        Peak Memory (MB) & 2 & $92.19$ \\
+        Energy (kW) & 1 & $2.12$ \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the ANTICIPATE algorithm with bounds on the runtime}
+    \label{tab:anticipate_min_targets}
+\end{table}
+
+In \ref{tab:anticipate_results} we can see some the results of some combination of constraints on Solution cost (which is
+expressed €), and Average Memory consumption (expressed in MB), with the objective of minimizing the CO2e 
+emissions (in kg). The rows filled with "none" indicates that HADA didn't found a solution satisfying those constraints for the
+given algorithm.
 
 \begin{table}[h!]
     \centering
@@ -419,24 +445,36 @@ on Solution cost (which is expressed in thousands of euros), and Average Memory 
         \hline
         \multicolumn{2}{c|}{Bounds} & \multicolumn{5}{c}{Solution} \\
         \hline
-        mem & sol & $n^P$ & HW & CO2e & mem & cost \\
+        Memory & Cost & $n^P$ & HW & CO2e & Memory & Cost \\
         \hline
-        no & no & 1 & mbp19 & $7.23 \times 10^{-6}$ & boh & boh \\
+        no & no & 1 & mbp19 & $7.23 \times 10^{-6}$ & - & - \\
+        80 & no & none & none & none & none & none \\
+        no & 100 & none & none & none & none & none \\
+        100 & 300 & none & none & none & none & none \\
+        150 & 300 & 64 & mbp19 & $3.75 \times 10^{-4}$ & $141.53$ & $299.46k$ \\
+        170 & 270 & 97 & mbp19 & $5.70 \times 10^{-4}$ & 169.85 & 267.39k \\
+        170 & 280 & 87 & mbp19 & $5.10 \times 10^{-4}$ & 160.12 & 276.86k \\
+        300 & 500 & 1 & mbp19 & $7.23 \times 10^{-6}$ & 81.47 & 368.73k \\
         \hline
     \end{tabular}
     \caption{Experimental results for the ANTICIPATE algorithm with bounds on the runtime}
     \label{tab:anticipate_results}
 \end{table}
 
+We'll now see some experiments on CONTINGENCY.
+
 \begin{table}[h!]
     \centering
     \begin{tabular}{cc|ccccc}
         \hline
         \multicolumn{2}{c|}{Bounds} & \multicolumn{5}{c}{Solution} \\
         \hline
-        mem & sol & $n^P$ & HW & CO2e & mem & cost \\
+        Memory & Cost & $n^P$ & HW & CO2e & Memory & Cost \\
         \hline
-        no & no & 1 & mbp19 & $7.23 \times 10^{-6}$ & boh & boh \\
+        no & no & 2 & mbp19 & $1.29 \times 10^{-6}$ & - & - \\
+        100 & no & none & none & none & none & none \\
+        no & 100 & none & none & none & none & none \\
+        150 & 400 & 2 & mbp19 & $1.29 \times 10^{-6}$ & 119.80 & 380.10 \\
         \hline
     \end{tabular}
     \caption{Experimental results for the CONTINGENCY algorithm with bounds on the runtime}

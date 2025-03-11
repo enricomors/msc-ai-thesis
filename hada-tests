@@ -1,0 +1,70 @@
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"anticipate",
+"objective": {"target":"CO2e(kg)", "type": "min"},
+"robustness_fact": null,
+"constraints": [
+    {"target": "memAvg(MB)", "type": "leq", "value": 170},
+    {"target": "sol(keuro)", "type": "leq", "value": 270}
+],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"load_std", "value": 167},
+    {"name":"load_mean", "value": 314},
+    {"name":"pv_std", "value": 276},
+    {"name":"pv_mean", "value": 268}
+], 
+"country": "Italy"}' localhost:5000/optimize
+
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"anticipate",
+"objective": {"target":"CO2e(kg)", "type": "min"},
+"robustness_fact": null,
+"constraints": [
+    {"target": "sol(keuro)", "type": "leq", "value": 400}
+],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"load_std", "value": 167},
+    {"name":"load_mean", "value": 314},
+    {"name":"pv_std", "value": 276},
+    {"name":"pv_mean", "value": 268}
+], 
+"country": "Italy"}' localhost:5000/optimize
+
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"anticipate",
+"objective": {"target":"sol(keuro)", "type": "min"},
+"robustness_fact": null,
+"constraints": [
+    {"target": "memAvg(MB)", "type": "leq", "value": 165}
+],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"load_std", "value": 167},
+    {"name":"load_mean", "value": 314},
+    {"name":"pv_std", "value": 276},
+    {"name":"pv_mean", "value": 268}
+], 
+"country": "Italy"}' localhost:5000/optimize
+
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"anticipate",
+"objective": {"target":"totEnergy(kW)", "type": "min"},
+"robustness_fact": null,
+"constraints": [],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"load_std", "value": 167},
+    {"name":"load_mean", "value": 314},
+    {"name":"pv_std", "value": 276},
+    {"name":"pv_mean", "value": 268}
+], 
+"country": "Italy"}' localhost:5000/optimize
