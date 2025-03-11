@@ -26,7 +26,7 @@
 \topic{Intelligent Systems}
 \candidate{Enrico Morselli}
 \supervisor{Prof.~Andrea Borghesi}
-\cosupervisor{& Allegra De Filippo, PhD.} % One co-supervisor.
+\cosupervisor{& Prof.~Allegra De Filippo} % One co-supervisor.
 %	\cosupervisors{& Dott.~Ing.~Luigi Bianchi\\& Dott~Avv.~Lucia Rossi} % More than one co-supervisor.
 \academicyear{2024-2025}
 \session{5th}
@@ -373,9 +373,23 @@ Experiments were conducted on:
 
 ANTICIPATE and CONTINGENCY were executed on 30 instances which were sampled with a statistical model with a Gaussian distribution \cite{DEFILIPPO2022109199}.
 On each instance, each algorithm was executed with parameter (i.e. number of traces or scenarios) values ranging from 1 to 100. For ANTICIPATE and CONTINGENCY we
-used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a dataset with a total of $30 \times 100 \times 2 \times 2 = 12,000$ entries.
+used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a dataset with a total of $30 \times 100 \times 2 \times 2 = 12,000$ entries. 
 
-% MEMORY USAGE 
+To generate a benchmark dataset for the Min-Cut/Max-Flow algorithms, we relied on the dataset provided by [Insert source]. This is an extensive collection of instances
+of Min-Cut/Max-Flow problems in the Computer Vision field. The authors also provided the implementations of the algorithms that were used to generate our benchmark data.
+Since they are implemented in C++ (BK and EIBFS) and C (HPF), we faced the problem of how to track the energy consumption and thus the emissions of such code. Apparently,
+there are not much tool available to monitor the emissions of C code. % TODO: expand this in the RELATED WORK SECTION.
+We opted for using a python wrapper script, that runs the C++/C scripts implementing the algorithms and uses CodeCarbon to track the energy consumption of the script execution.
+For reasons due to lacking support on MacOS, i was not able to compile the BK and EIBFS implementation on mbp19. Instead, i have managed to restore an old PC i had at home 
+with a light distribution of Ubuntu to run some of these scripts. 
+It is important to point out that we did not executed the selected algorithms on the whole dataset, since some of the problem instances were very big, sometimes exceeding the available memory,
+we just ran a subset of them - even if it was possible to create a swap partition big enough to accomodate bigger instances, the monitoring tools available just record the 
+used RAM, so the estimate of the memory usage would be downsized in such cases. Also, due to the large number of instances, running a benchmark phase on all of them would have
+been way too time consuming. 
+
+\subsection{ANTICIPATE and CONTINGENCY}
+
+% BOX PLOTS
 
 \begin{figure}[h!]
     \centering
@@ -393,20 +407,6 @@ used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a datase
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/ant_corr_mat.png}
-    \caption{Correlation matrix for ANTICIPATE}
-    \label{fig:ant_corr_mat}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{imgs/cont_corr_mat.png}
-    \caption{Correlation matrix for CONTINGENCY}
-    \label{fig:ant_corr_mat}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
     \includegraphics[width=0.8\textwidth]{imgs/CO2_emissions_no_outliers.png}
     \caption{CO2 emissions for ANTICIPATE and CONGINGENCY ordered by platform}
     \label{fig:ant_cont_co2_emissions}
@@ -419,17 +419,21 @@ used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a datase
     \label{fig:ant_cont_energy}
 \end{figure}
 
-As we can see in [old matrix], the average and peak memory usage has the highest correlation with the Carbon Emissions of the algorithms. In particular
-memAvg has a positive correlation of $0.87$, and memPeak of $0.69$. As we could expect, these two metrics are highly correlated with one another, with a score of $.80$.
-Then, \verb|totEnergy| has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions, as measured
-by CodeCarbon, depends by two factors, i.e. the energy consumed by running the algorithm and the Carbon Intensity. Since we executed all the experiments in the same
-country, the Carbon Intensity over the whole dataset is fixed, meaning that the only factor influencing the CO2e emissions is the energy consumed, while the Carbon Intensity
-is just a scaling factor. Indeed, \verb|totEnergy| and \verb|CO2e| both the same correlation values with the other variables. Then, as one may point out, we could just remove
-the energy consumption values from the dataset, and just keep the emissions. However, the energy consumption values can be scaled by different Carbon Intensity values, giving
-the possibility of evaluating the impact of changing the location of the computations, as we will see later on.
-Lastly, regarding the solution cost (which is inversely proportional to the solution quality), we can point out that the factor which has the most impact on it is the average memory,
-having a negative correlation of $-0.47$. Between the solution cost and the emissions, the correlation is a bit weaker, being $-0.36$. We could then perform some tests with HADA
-to asses the impact of constraints on memory and solution quality on the carbon emissions and viceversa.
+% CORRELATION MATRICES
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/ant_corr_mat.png}
+    \caption{Correlation matrix for ANTICIPATE}
+    \label{fig:ant_corr_mat}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/cont_corr_mat.png}
+    \caption{Correlation matrix for CONTINGENCY}
+    \label{fig:cont_corr_mat}
+\end{figure}
 
 Here we can see some results given by the HADA framework tested on the updated dataset for ANTICIPATE and CONTINGENCY. \ref{tab:anticipate_results}
 presents the results of optimising any target without any constraints for ANTICIPATE. We can notice how, for most metrics keeping the number of scenarios
@@ -477,10 +481,16 @@ as low as possible is the best choice, while increasing them brings the solution
     \label{tab:contingency_min_targets}
 \end{table}
 
-In \ref{tab:anticipate_results} we can see some the results of some combination of constraints on Solution cost (which is
-expressed €), and Average Memory consumption (expressed in MB), with the objective of minimizing the CO2e 
-emissions (in kg). The rows filled with "none" indicates that HADA didn't found a solution satisfying those constraints for the
-given algorithm.
+As we can see in \ref{fig:ant_corr_mat}, \verb|totEnergy| has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions,
+as measured by CodeCarbon, depends by two factors, i.e. the energy consumed by running the algorithm and the Carbon Intensity. Since we executed all the experiments in the same
+country, the Carbon Intensity over the whole dataset is fixed, meaning that the only factor influencing the CO2e emissions is the energy consumed, while the Carbon Intensity
+is just a scaling factor. Indeed, \verb|totEnergy| and \verb|CO2e| both the same correlation values with the other variables. Also, as we could expect, the correlation
+of \verb|CO2e| with \verb|cpuEnergy| and \verb|ramEnergy| is also pretty high, being of $0.98$ and $0.99$ respectively, and that reflects the fact that actually the total energy consumption is
+nothing but the sum of \verb|cpuEnergy| and \verb|ramEnergy|. Then, as one may point out, we could just remove the energy consumption values from the dataset, and just keep the emissions.
+However, the energy consumption values can be scaled by different Carbon Intensity values, giving the possibility of evaluating the impact of changing the location of the computations, as we will see later on.
+Then, we can see that the average memory consumption is the variable with the highest correlation with the carbon emissions except for energy consumption, with a value of $0.93$. Then, we can see
+that for ANTICIPATE the emissions are also influenced a bit by the value of the parameter ($0.65$) and the Solution Cost ($-0.57$). We could then perform some tests on ANTICIPATE with HADA
+to asses the impact of constraints on memory and solution quality.
 
 \begin{table}[h!]
     \centering
@@ -492,19 +502,26 @@ given algorithm.
         \hline
         no & no & 1 & mbp19 & $7.23 \times 10^{-6}$ & - & - \\
         80 & no & none & none & none & none & none \\
-        no & 100 & none & none & none & none & none \\
-        100 & 300 & none & none & none & none & none \\
-        150 & 300 & 64 & mbp19 & $3.75 \times 10^{-4}$ & $141.53$ & $299.46k$ \\
-        170 & 270 & 97 & mbp19 & $5.70 \times 10^{-4}$ & 169.85 & 267.39k \\
-        170 & 280 & 87 & mbp19 & $5.10 \times 10^{-4}$ & 160.12 & 276.86k \\
-        300 & 500 & 1 & mbp19 & $7.23 \times 10^{-6}$ & 81.47 & 368.73k \\
+        no & $100k$ & none & none & none & none & none \\
+        100 & $300k$ & none & none & none & none & none \\
+        150 & $300k$ & 64 & mbp19 & $3.75 \times 10^{-4}$ & $141.53$ & $299.46k$ \\
+        170 & $270k$ & 97 & mbp19 & $5.70 \times 10^{-4}$ & $169.85$ & $267.39k$ \\
+        170 & $280k$ & 87 & mbp19 & $5.10 \times 10^{-4}$ & $160.12$ & $276.86k$ \\
+        300 & $500k$ & 1 & mbp19 & $7.23 \times 10^{-6}$ & $81.47$ & $368.73k$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the ANTICIPATE algorithm with bounds on the runtime}
+    \caption{Experimental results for the ANTICIPATE algorithm with bounds Memory usage and Solution cost}
     \label{tab:anticipate_results}
 \end{table}
 
-We'll now see some experiments on CONTINGENCY.
+In \ref{tab:anticipate_results} we can see some the results of some combination of constraints on Solution cost (which is
+expressed €), and Average Memory consumption (expressed in MB), with the objective of minimizing the CO2e 
+emissions (in kg). The rows filled with "none" indicates that HADA didn't found a solution satisfying those constraints for the
+given algorithm.
+
+For CONTINGENCY, \ref{fig:cont_corr_mat} shows how the variables show very little amount of linear correlation between one another. The strongest relation is between the runtime and the amount of memory consumed
+(with a score of $0.60$ for \verb|memAvg| and $0.58$ for \verb|memPeak|). As for the Carbon Footprint, the value that influence it the most is the runtime, with a postivie correlation of $0.47$.
+So we will try to test HADA on CONTINGENCY with constraints on the Runtime (expressed in seconds), and the Solution cost.
 
 \begin{table}[h!]
     \centering
@@ -512,19 +529,24 @@ We'll now see some experiments on CONTINGENCY.
         \hline
         \multicolumn{2}{|c|}{Bounds} & \multicolumn{5}{c|}{Solution} \\
         \hline
-        Memory & Cost & $n^P$ & HW & CO2e & Memory & Cost \\
+        Time & Cost & $n^P$ & HW & CO2e & Time & Cost \\
         \hline
         no & no & 2 & mbp19 & $1.29 \times 10^{-6}$ & - & - \\
-        100 & no & none & none & none & none & none \\
-        no & 100 & none & none & none & none & none \\
-        150 & 400 & 2 & mbp19 & $1.29 \times 10^{-6}$ & 119.80 & 380.10 \\
+        no & $350k$ & 4 & mbp19 & $1.53 \times 10^{6}$ & - & $338.23k$ \\
+        10 & no & 2 & mbp19 & $1.29 \times 10^{-6}$ & $6.01$ & - \\
+        10 & $320k$ & none & none & none & none & none \\
+        60 & $350k$ & 4 & mbp19 & $1.29 \times 10^{-6}$ & $7.68$ & $338.23$ \\
+        120 & $320k$ & 90 & mbp19 & $1.24 \times 10^{-5}$ & $119.47$ & $314.11k$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the CONTINGENCY algorithm with bounds on the runtime}
+    \caption{Experimental results for the CONTINGENCY algorithm with bounds on Runtime and Memory usage}
     \label{tab:contingency_results}
 \end{table}
 
-Next, we take a look at the correlation values for the Min-cut/Max-flow algorithms
+\subsection{Min-Cut/Max-Flow Algorithms}
+
+Next, we take a look at the benchmark dataset of the Min-cut/Max-flow algorithms. By looking at the data, the first thing we may notice is that points are mostly concentrated in a small area.
+This is due to the fact that many of the instances were similar problems with standard graph sizes (nodes, arcs), which are quite small, and in proportion, bigger problems are way less. 
 
 \begin{figure}[h!]
     \centering

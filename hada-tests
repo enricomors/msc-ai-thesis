@@ -3,8 +3,8 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "memAvg(MB)", "type": "leq", "value": 170},
-    {"target": "sol(keuro)", "type": "leq", "value": 270}
+    {"target": "time(sec)", "type": "leq", "value": 240},
+    {"target": "sol(keuro)", "type": "leq", "value": 370}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
@@ -22,7 +22,7 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "sol(keuro)", "type": "leq", "value": 400}
+    {"target": "time(sec)", "type": "leq", "value": 10}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
@@ -37,10 +37,10 @@ curl -X POST -H 'Content-Type: application/json' -d '
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
 {"algorithm":"contingency",
-"objective": {"target":"sol(keuro)", "type": "min"},
+"objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "memAvg(MB)", "type": "leq", "value": 165}
+    {"target": "sol(keuro)", "type": "leq", "value": 350}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
@@ -55,7 +55,7 @@ curl -X POST -H 'Content-Type: application/json' -d '
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
 {"algorithm":"contingency",
-"objective": {"target":"totEnergy(kW)", "type": "min"},
+"objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [],
 "prices": [
