@@ -398,6 +398,8 @@ used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a datase
     \label{fig:ant_cont_corr_mat}
 \end{figure}
 
+% TODO: explore the relationship between other metrics, e.g. check the correlations of cpu energy and ram energy with other variables (even if it should be almost the same as the totEnergy)
+
 As we can see in \ref{fig:ant_cont_corr_mat}, the average and peak memory usage has the highest correlation with the Carbon Emissions of the algorithms. In particular
 memAvg has a positive correlation of $0.87$, and memPeak of $0.69$. As we could expect, these two metrics are highly correlated with one another, with a score of $.80$.
 Then, \verb|totEnergy| has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions, as measured
@@ -433,6 +435,8 @@ as low as possible is the best choice, while increasing them brings the solution
     \caption{Experimental results for the ANTICIPATE algorithm with bounds on the runtime}
     \label{tab:anticipate_min_targets}
 \end{table}
+
+% TODO: check minimum values of other metrics too
 
 In \ref{tab:anticipate_results} we can see some the results of some combination of constraints on Solution cost (which is
 expressed €), and Average Memory consumption (expressed in MB), with the objective of minimizing the CO2e 
