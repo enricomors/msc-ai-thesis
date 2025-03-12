@@ -42,30 +42,42 @@
 
 \section{Background and Rationale}
 
-In recent years we have witnessed a dramatic increase in the performance of Artificial Intelligence technologies. Even if
-AI still fails to exeed human ability in some complex cognitive tasks, as of 2023 it has surpassed human capabilites in a
-range of tasks, such as image classification, basic reading comprehension, visual reasoning and natural language inference
-\cite{AIIndexReport}. Not to mention the astonishing results achieved by Generative AI in tasks as Image and Video Generation
-\cite{AIIndexReport}. This great advances in performance were made possible by a massive upscale of model sizes and 
-computational resources ("compute" in short) dedicated to training state-of-the-art AI models. Research shows that for 
-frontier AI models (i.e. those that were in the top 10 of training compute when they were released), the training compute has 
-grown by a factor of 4-5x/year since 2010 \cite{epoch2024compute}. This surge in required compute has driven a corresponding 
-spike in energy consumption for AI, and consequently, an higher environmental impact due to $\mathrm{CO_2}$ emissions.
-For instance, for trainining their LLaMA models, Meta AI researchers have estimated a period of approximately 5 months of 
-on $2048$ $\mathrm{A}100$ $80\mathrm{GB}$ GPUs, resulting in a total of $2,638 \mathrm{MWh}$ of energy and a total emission of 
-$1,015$ $\mathrm{tCO_2eq}$ \cite{touvron2023llama}. Given the widespread application, the steep increase in model size and
-complexity and the crescent energy requirements for AI applications, the Carbon Footprint of AI has become a growing concern
-in the context of the current climate emergency.
+\section{Introduction}
 
-In this work, we will explore an approach for addressing the issue of AI sustainability, by means of HADA (HArdware 
-Dimensioning for AI Algorithms), which is a framework that uses ML to learn the relationship between an algorithm 
-configuration and performance metrics, like total runtime, solution cost and memory usagem and then uses Optimization to find 
-the best Hardware architecture and its configuration to run an algorithm under required performances and budget limits
-which is the problem known as Hardware Dimensioning \cite{DEFILIPPO2022109199}. What we will do is to extend this framework
-in order to consider also the performance of the algorithms in terms of Energy consumption and Carbon Emissions, so that, 
-ideally, we could find the best Algorithm and Hardware configuration that reduces the Carbon Footprint of computation. We 
-will then proceed to test this approach on some small-scale algorithms that we could easily execute in a timely manner 
-on local machines and HPC clusters.
+In recent years, we have witnessed a dramatic improvement in the performance of Artificial Intelligence (AI) technologies. 
+While AI still falls short of human ability in some complex cognitive tasks, as of 2023, it has surpassed human capabilities 
+in various domains, including image classification, basic reading comprehension, visual reasoning, and natural language inference 
+\cite{AIIndexReport}. Moreover, Generative AI has achieved astonishing results in areas such as image and video generation, further 
+demonstrating the rapid advancements in the field \cite{AIIndexReport}. 
+
+These remarkable gains in AI performance have been primarily driven by the large-scale expansion of model sizes and computational 
+resources (often referred to as "compute") dedicated to training state-of-the-art AI models. Research indicates that, for frontier 
+AI models—those that ranked among the top 10 in terms of training compute at the time of their release—the amount of compute used
+for training has been increasing at an exponential rate, growing by a factor of 4-5x per year since 2010 \cite{epoch2024compute}. 
+
+However, this surge in compute requirements has led to a corresponding increase in energy consumption, which, in turn, has 
+amplified the environmental impact of AI due to $\mathrm{CO_2}$ emissions. For instance, the training of Meta AI's LLaMA models 
+was estimated to take approximately five months on a cluster of $2048$ $\mathrm{A}100$ $80\mathrm{GB}$ GPUs, consuming a total 
+of $2,638$ $\mathrm{MWh}$ of energy and producing approximately $1,015$ $\mathrm{tCO_2eq}$ in emissions \cite{touvron2023llama}. 
+Given the growing adoption of AI technologies, the rapid increase in model size and complexity, and the escalating energy demands 
+of AI applications, the carbon footprint of AI has become an increasingly pressing concern, particularly in the context of the 
+ongoing climate emergency.
+
+In this work, we explore a novel approach to addressing the sustainability challenges of AI by extending the HADA (HArdware 
+Dimensioning for AI Algorithms) framework. HADA is a framework that leverages Machine Learning (ML) to learn the relationship 
+between an algorithm's configuration and its performance metrics—such as total runtime, solution cost, and memory usage—and then 
+employs optimization techniques to identify the optimal hardware architecture and configuration that meet predefined performance 
+and budget constraints. This process, known as Hardware Dimensioning, has been studied as a means to efficiently allocate 
+computational resources while maintaining performance requirements \cite{DEFILIPPO2022109199}. 
+
+Our contribution extends HADA by incorporating energy consumption and carbon emissions as additional performance metrics. 
+By doing so, we aim to identify the best combination of algorithm and hardware configuration that minimizes the environmental 
+impact of computation. To validate our approach, we will conduct experiments on small-scale algorithms that can be executed in 
+a timely manner on local machines and high-performance computing (HPC) clusters. Ultimately, we seek to demonstrate how AI 
+workloads can be optimized not only for efficiency and cost but also for sustainability, thus contributing to the broader goal 
+of reducing AI's carbon footprint.
+
+% TODO: expand the "Rest of the work" section
 
 The rest of the work is structured as follows:
 \begin{itemize}
@@ -80,105 +92,137 @@ The rest of the work is structured as follows:
 
 \section{Sustainability in AI}
 
-The environmental impact of training large AI models is illustrated by recent empirical assessments. 
-Strubell et al. (2019) quantified the CO2 emissions of several NLP models and found that training a big
-transformer with extensive hyperparameter tuning (including neural architecture search) emitted roughly 
-626,000 pounds of $\mathrm{CO_2}$ - about the same as the lifetime emissions of five cars \cite{strubell2019energy}
-\cite{dodge2022carbon}. These findings brought attention to the fact that accuracy gains in AI often come 
-at a steep energy and carbon price. In response, researchers have begun to sistematically reporting energy
-use and consequent $\mathrm{CO_2}$ emissions of model training to raise awareness \cite{dodge2022carbon} 
-\cite{patterson2021carbon}. Beyond individual models, broader studies have examined AI's total energy and 
-environmental footprint across the industry. Henderson et al. (2020) \cite{henderson2020carbon} introduced 
-a framework for tracking real-time energy consumption and carbon emissions during ML experiments, encouraging
-researchers to include these metrics in publications. Their work underscored that transparent reporting 
-is essential for understanding and ultimately reducing AI's climate impacts. Industry-scale analyses also 
-reveal sobering trends. Gupta et al. (2021) \cite{gupta2020carbon} analyzed the end-to-end footprint of 
-computing and found that while operational emissions (from running hardware) have been partly curbed by 
-efficiency improvements, the overall carbon footprint of computing continues to grow due to increased scale. 
-Notably, they showed that for modern data centers and mobile devices, manufacturing and infrastructure 
-(embodied carbon) now account for the majority of emissions. In other words, as data centers adopt cleaner 
-power, the emissions “hidden” in hardware supply chains (chip fabrication, server manufacturing, etc.) 
-become a dominant concern. Similarly, Wu et al. (2022) \cite{wu2021sustainableai} present a holistic study 
-of AI at a large tech company (Meta/Facebook), examining the entire AI model lifecycle - from data processing 
-and training to inference and hardware lifecycle. They report super-linear growth in AI workloads and 
-infrastructure: for instance, daily inference operations doubled over a recent 3-year span, forcing a 2.5x
-expansion in server capacity. Crucially, Wu et al. also highlight that embodied carbon is an increasing 
-fraction of AI's total footprint, echoing that improvements in hardware efficiency alone cannot eliminate
-AI's impact. Their analysis argues for looking beyond training alone - considering data center construction, 
-supply chains, and the frequency of model retraining - to truly grasp AI's environmental impact.
+The environmental impact of training large AI models has been underscored by recent empirical assessments. Strubell et al. (2019)
+quantified the $\mathrm{CO_2}$ emissions of several Natural Language Processing (NLP) models and discovered that training a large
+transformer with extensive hyperparameter tuning, including neural architecture search, emitted approximately 626,000 pounds 
+(around 284 metric tons) of $\mathrm{CO_2}$—comparable to the lifetime emissions of five cars \cite{strubell2019energy}. 
+Another study found out that GPT-3 released 552 metric tons of $\mathrm{CO_2}$ into the atmosphere during training, the 
+equivalent of 123 gasoline-powered passenger vehicles driven for one year \cite{patterson2021carbon}. These findings highlight that 
+improvements in AI accuracy often come at a significant energy and carbon cost.
 
-A recurring theme in these studies is the diminishing return on energy investment for AI model improvements.
-As models get larger and more complex, the incremental accuracy gains often require disproportionately more 
-compute (and thus energy). Schwartz et al. (2020) \cite{GreenAI} dub the status quo “Red AI,” where 
-researchers prioritize accuracy at almost any computational cost, and they note this trend is unsustainable 
-both environmentally and even economically. Thompson et al. (2021) \cite{thompson2021deeplearning} similarly
-observed that progress in benchmarks was coming with exponentially increasing computing cost, warning of 
-diminishing returns and calling the situation unsustainable. Another challenge is equitable access: massive 
-energy requirements make cutting-edge AI research expensive, potentially concentrating it in wealthy 
-institutions and regions with robust infrastructure. This raises concerns that AI's growing energy hunger 
-not only harms the planet but also exacerbates inequalities in who can afford to do top-tier research. These 
-concerns have prompted calls for a paradigm shift toward “Green AI”, where efficiency and sustainability are 
-treated as primary goals in model development. Several studies have addressed the issue of AI's carbon 
-footprint. 
+In response to these concerns, researchers have begun systematically reporting energy usage and the resulting $\mathrm{CO_2}$ 
+emissions associated with model training to raise awareness \cite{dodge2022carbon, patterson2021carbon}. Transparent reporting 
+is essential for understanding and ultimately mitigating AI's climate impacts. For instance, Henderson et al. (2020) introduced 
+a framework for tracking real-time energy consumption and carbon emissions during Machine Learning (ML) experiments, encouraging 
+researchers to include these metrics in their publications \cite{henderson2020carbon}.
 
-\section{Tools for tracking Carbon Emissions}
+Broader studies have examined AI's total energy and environmental footprint across the industry. Gupta et al. (2021) analyzed 
+the end-to-end footprint of computing and found that while operational emissions (from running hardware) have been partly curbed 
+by efficiency improvements, the overall carbon footprint of computing continues to grow due to increased scale. Notably, they 
+showed that for modern data centers and mobile devices, manufacturing and infrastructure (embodied carbon) now account for the 
+majority of emissions. As data centers adopt cleaner power, the emissions embedded in hardware supply chains—such as chip 
+fabrication and server manufacturing—become a dominant concern. \cite{gupta2020carbon}
 
-The growing awareness about AI's Carbon Footprint also motivated the development of dedicated tools and
-methodologies to monitor the carbon footprint of AI workloads. A number of open-source tools and frameworks
-have been created to help practitioners measure the energy consumption and $\mathrm{CO_2}$ emissions of their
-code. ML $\mathrm{CO_2}$ Impact (Machine Learning Emissions Calculator), introduced by Lacoste et al. (2019),
-\cite{lacoste2019quantifying} was one of the early tools for estimating emissions from model training. It is a 
-web-based calculator where users input  information about their training run - such as hardware type (CPU/GPU), runtime, 
-cloud provider, and location - and it computes the energy consumed and corresponding carbon emissions. 
-The calculator leverages known power draw profiles of  hardware and regional carbon intensity factors. According to
-\cite{bannour-etal-2021-evaluating}
-the latest incarnation of this tool has evolved under the umbrella of the CodeCarbon initiative, integrating its 
-functionality into CodeCarbon's open-source package.
-    
-\textbf{CodeCarbon} \cite{courty2024codecarbon}, which is the tool we used to expand HADA in this work, 
-is an open-source Python package for tracking the carbon footprint  of computing projects. It 
-integrates into ML code to log the resources used (CPU, GPU, etc.) and estimates the $\mathrm{CO_2}$ emissions
-produced by the workload. Uniquely, CodeCarbon accounts for the location of the computation - using 
-region-specific electricity carbon intensity data - to provide location-dependent emission estimates. 
-This allows developers to see, for instance, that running the same training job on a low-carbon grid 
-(e.g. hydro-powered Montreal) results in a much smaller footprint than running it on a coal-heavy grid. 
-The goal is to inform and incentivize researchers and engineers to optimize or relocate their workloads to 
-reduce emissions.
+Similarly, Wu et al. (2022) conducted a comprehensive study of AI at a large technology company (Meta/Facebook), examining the 
+entire AI model lifecycle—from data processing and training to inference and hardware lifecycle. They reported super-linear 
+growth in AI workloads and infrastructure; for instance, daily inference operations doubled over a recent three-year span, 
+necessitating a 2.5x expansion in server capacity. Crucially, Wu et al. also highlighted that embodied carbon is an increasing 
+fraction of AI's total footprint, echoing that improvements in hardware efficiency alone cannot eliminate AI's impact. Their 
+analysis argues for looking beyond training alone—considering data center construction, supply chains, and the frequency of 
+model retraining—to truly grasp AI's environmental impact. \cite{wu2021sustainableai}
 
-Considerable work has been done in the field of Large Language Models (LLMs), which are the models that have had the most 
-dramatic growth in complexity and size.
+A recurring theme in these studies is the diminishing return on energy investment for AI model improvements. As models become 
+larger and more complex, incremental accuracy gains often require disproportionately more compute power, and thus energy. 
+Schwartz et al. (2020) termed this phenomenon "Red AI," where researchers prioritize accuracy regardless of computational cost, 
+and noted this trend is unsustainable both environmentally and economically \cite{GreenAI}. Thompson et al. (2021) similarly 
+observed that progress in benchmarks was accompanied by exponentially increasing computing costs, warning of diminishing returns 
+and calling the situation unsustainable. \cite{thompson2021deeplearning}
 
-There exists also other works that tried to address not only the emissions resulting from model's training and inference,
-but also those emissions resulting from the manifacturing of the Hardware components, which are \textit{embodied} in the 
-total Carbon Footprint. A work in this direction is \cite{faiz2024llmcarbon}, that provides a model to estimate the total
-emissions of an LLM both in terms of \textit{Operational} Carbon Footprint and \textit{Embodied} Carbon Footprint. This work
-also deploys considerations about the Data Center Energy Efficency - expressed by the Power Usage Efficency (PUE) - and the 
-Carbon Intensity of the Electricity used, reinforcing the observations by CodeCarbon, i.e. that performing the computations
-in places where the energy is cleaner can significantly reduce $\mathrm{CO_2}$ emissions.
+Another challenge is equitable access: massive energy requirements make cutting-edge AI research expensive, potentially 
+concentrating it in wealthy institutions and regions with robust infrastructure. This raises concerns that AI's growing energy 
+demands not only harm the planet but also exacerbate inequalities in who can afford to conduct top-tier research. These concerns 
+have prompted calls for a paradigm shift toward "Green AI," where efficiency and sustainability are treated as primary goals in 
+model development.
+
+In summary, the environmental sustainability of AI has become a critical area of concern. As the field advances, it is 
+imperative to balance the pursuit of performance improvements with the need to minimize energy consumption and carbon emissions. 
+This balance is essential not only for mitigating climate change but also for ensuring equitable access to AI research and 
+development.
+
+\section{Tools for Tracking Carbon Emissions}
+
+The increasing awareness of AI’s carbon footprint has motivated the development of dedicated tools and methodologies for monitoring 
+the environmental impact of AI workloads. A number of open-source tools and frameworks have been introduced to help practitioners 
+measure the energy consumption and $\mathrm{CO_2}$ emissions of their code, enabling more informed decisions about sustainability 
+in AI research and deployment.
+
+One of the early tools for estimating emissions from model training was \textbf{ML CO2 Impact} (Machine Learning 
+Emissions Calculator), introduced by Lacoste et al. (2019) \cite{lacoste2019quantifying}. This web-based calculator allows users 
+to input key information about their training runs—such as hardware type (CPU/GPU), runtime, cloud provider, and location—and 
+computes the corresponding energy consumption and carbon emissions. The tool relies on known power draw profiles of hardware 
+components and regional carbon intensity factors to generate estimates. According to Bannour et al. (2021) 
+\cite{bannour-etal-2021-evaluating}, the latest iteration of this tool has evolved under the umbrella of the \textbf{CodeCarbon} 
+initiative, integrating its functionality into the open-source CodeCarbon package.
+
+\textbf{CodeCarbon} \cite{courty2024codecarbon}, which is the tool we employ in this work to enhance HADA, is an open-source 
+Python package designed to track the carbon footprint of computing projects. It integrates seamlessly into ML workflows, 
+logging resource usage (CPU, GPU, and other components) and estimating the $\mathrm{CO_2}$ emissions produced by the workload. 
+A key feature of CodeCarbon is its ability to account for the geographic location of the computation—leveraging region-specific 
+electricity carbon intensity data to provide location-dependent emission estimates. \textbf{Carbon Intensity} refers to the 
+amount of $\mathrm{CO_2}$ emitted per unit of electricity generated, typically measured in grams of $\mathrm{CO_2}$ per 
+kilowatt-hour (gCO$_2$/kWh). This metric varies significantly across regions depending on the energy mix used for electricity 
+generation. For example, a region relying primarily on coal-fired power plants will have a much higher carbon intensity compared 
+to one powered predominantly by renewable sources such as hydropower or wind energy. By incorporating this factor, CodeCarbon 
+enables users to assess and compare the emissions impact of running their workloads in different locations. This means that 
+shifting computations to regions with lower-carbon grids can lead to substantial reductions in total $\mathrm{CO_2}$ emissions.
+This feature allows researchers and engineers to assess the impact of their computational choices; for example, running the same 
+training job on a hydro-powered grid (e.g., in Montreal) results in significantly lower emissions than executing it on a 
+coal-reliant grid. By making these comparisons explicit, CodeCarbon aims to inform and incentivize practitioners to optimize or 
+relocate their workloads in a manner that reduces emissions.
+
+Considerable efforts have also been made to quantify the carbon footprint of \textbf{Large Language Models (LLMs)}, as these 
+models have experienced the most dramatic growth in both complexity and size. While much attention has been given to the energy 
+demands of training these models, recent studies have also highlighted the substantial energy costs incurred during inference—the 
+phase where models generate responses based on input data. Husom et al. (2024) introduced MELODI (Monitoring Energy Levels and 
+Optimization for Data-driven Inference), a comprehensive framework designed to monitor and analyze energy consumption during LLM 
+inference processes \cite{husom2024priceprompting}. MELODI enables detailed observations of power consumption dynamics and 
+facilitates the creation of a dataset reflective of energy efficiency across varied deployment scenarios. Their findings indicate 
+substantial disparities in energy efficiency, suggesting ample scope for optimization and the adoption of sustainable measures 
+in LLM deployment. Similarly, Samsi et al. (2023) conducted experiments to study the computational and energy utilization of 
+LLM inference, focusing on different sizes of LLaMA—a state-of-the-art LLM developed by Meta AI—on two generations of popular 
+GPUs (NVIDIA V100 and A100) \cite{samsi2023wordswattsbenchmarkingenergy}. They benchmarked inference performance and energy 
+costs across diverse tasks and presented results of multi-node, multi-GPU inference using model sharding across up to 32 GPUs. 
+Their work provides valuable insights into compute performance and energy utilization characteristics of LLM inference, 
+highlighting the need for cost-saving measures, efficient hardware usage, and optimal deployment strategies. Faiz et al. (2024) 
+\cite{faiz2024llmcarbon}, introduces a model to estimate the total emissions of an LLM, accounting for both its \textit{Operational} 
+Carbon Footprint (energy consumption during training and inference) and its \textit{Embodied} Carbon Footprint (emissions from 
+hardware production and infrastructure). This study also highlights the importance of \textbf{Data Center Energy Efficiency}, 
+measured by the \textit{Power Usage Effectiveness (PUE)}, and the \textbf{Carbon Intensity of Electricity}—factors that reinforce 
+the findings of CodeCarbon. Specifically, the study emphasizes that performing AI computations in regions where energy sources 
+are cleaner (e.g., renewable-powered grids) can significantly reduce $\mathrm{CO_2}$ emissions. 
+
+The development and adoption of these tracking tools play a crucial role in promoting sustainable AI research and deployment. 
+By quantifying emissions and identifying optimization strategies, these tools provide the foundation for a more environmentally 
+responsible approach to AI development.
  
-\chapter{Metodology}
+\chapter{Methodology}
 
 \section{Empirical Model Learning in HADA} \label{EML-HADA}
 
-As we mentioned in the introduction, the main focus of this work is Hardware Dimensioning, i.e. the problem of finding the right 
-Hardware configuration to run the desired algorithm under required performance and budget limits. More specifically, we are given a 
-target algorithm, and we would like to know what is the optimal settings of Algorithm Hyperparameters and Hardware Architecture to
-run the algorithm under a set of constraints in terms of performance requirements. This is not a trivial problem 
-to model, owing to the complexity of knowing beforehand the performance of an AI algorithm on different HW architectures and 
-evaluating the effect of different HW and algorithm configurations. The idea behind HADA is to integrate the domain knowledge held by experts 
-(time constraints, required solution quality, budget limits) with data-driven models.
-The basis of HADA is the \textbf{Empirical Model Learning (EML)}, \cite{LOMBARDI2017343} framework, which uses Machine Learning (ML) 
-techniques to learn the model of an Optimisation problem. The idea is to learn, rather than directly express, complex relationships
-between algorithm performance and HW resources via ML models, using \textit{empirical} knowledge. These models are then embedded in the optimisation problem. 
-In general, this approach is useful whenever the problem to solve using optimisation is very complex and therefore not trivial 
-to derive a model to describe it. Broadly speaking, EML deals with solving declarative optimisation models with a complex component, $h$, which represents 
-the relation between variables which can be acted upon (the decision variables, also called \textit{decidables}) $x$ and 
-the \textit{observables} $y$ related to the system considered; 
-the function $h(x)=y$ describes this relationships. Since the $h$ component is complex and we cannot 
-optimise directly over it, we exploit empirical knowledge to build a surrogate model $h_{\theta}$ learned from data, 
-where $\theta$ is the parameter vector. 
+As introduced earlier, the core focus of this work is \textbf{Hardware Dimensioning}, which refers to the challenge of identifying 
+the most suitable hardware configuration for executing a given algorithm while meeting predefined performance and budget constraints.
+Specifically, given a target algorithm, our goal is to determine the optimal combination of algorithmic hyperparameters and hardware
+architecture that ensures the algorithm operates efficiently under specific performance requirements. However, this is a non-trivial 
+optimization problem, primarily due to the difficulty of predicting an AI algorithm’s performance across different hardware architectures 
+and evaluating the impact of varying algorithmic and hardware configurations.
 
-We present here the general mathematical formulation of EML:
+The key idea behind HADA is to integrate expert domain knowledge, such as execution time constraints, required solution quality, and budget 
+limitations, with data-driven models that can infer performance relationships. At the foundation of HADA lies the \textbf{Empirical Model 
+Learning (EML)} framework \cite{LOMBARDI2017343}, which employs Machine Learning (ML) techniques to construct a model of an optimization 
+problem. Instead of explicitly formulating complex relationships between algorithm performance and hardware resources, EML leverages 
+data-driven approximations, learning these dependencies empirically. These learned models are then embedded directly within the 
+optimization process.
+
+This approach is particularly advantageous in scenarios where deriving an exact mathematical formulation for the problem is infeasible 
+due to its complexity. Broadly, EML facilitates the resolution of declarative optimization models that involve an intricate component, 
+denoted as $h$, which captures the relationship between \textit{decision variables} (also called \textit{decidables}) $x$ and 
+\textit{observables} $y$—i.e., measurable performance metrics of the system. This relationship is represented by the function $h(x) = y$. 
+Since $h$ is often highly complex and not directly optimizable, an alternative approach is to learn an approximate model, denoted as 
+$h_{\theta}$, where $\theta$ represents the set of learned parameters.
+
+\subsection{Mathematical Formulation}
+
+The general mathematical formulation of the EML framework can be expressed as follows:
 
 \begin{align}
     \min \quad & f(x, y) \label{eq:objective} \\
@@ -187,77 +231,110 @@ We present here the general mathematical formulation of EML:
     & x_i \in D_i \quad \forall x_i \in x \label{eq:domain}
 \end{align}
 
-where $x$ is the decision variables vector (each $x_i$ has its own domain $D_i$) and $y$ is the vector of observed variables.
-The goal is to minimize the objective function $f(x,y)$, which might depend on both decision and observed variables. Both 
-decision and observed variables can be subject to a set of constraints $g_j(x,y)$, such as classical inequalities from 
-Mathematical Programming and combinatorial predicates from Constraint Programming (e.g., global constraints). The function 
-$h_{\theta}(x)$ represents the approximate behaviour of the complex relation between decision and observed variables, and it 
-is, in practice, the encoding of a ML model.
+where:
+\begin{itemize}
+    \item $x$ represents the vector of decision variables, each $x_i$ belonging to a domain $D_i$;
+    \item $y$ denotes the vector of observed variables;
+    \item The objective function $f(x, y)$, which depends on both decision and observed variables, is to be minimized;
+    \item Constraints $g_j(x, y)$ enforce feasibility conditions on the variables, which can include classical mathematical programming 
+    inequalities and combinatorial constraints from Constraint Programming;
+    \item The function $h_{\theta}(x)$ serves as an approximation of the complex relationship between decision and observed variables, and 
+    it is instantiated as a trained ML model.
+\end{itemize}
 
-The surrogate model $h_{\theta}(x)$ is trained as in the typical Supervised Learning setting; EML requires a training set 
-$\mathcal{S} = (x_i, h(x_i))_{i=1}^{m}$ which is then used to find the parameter vector $\theta$ minimizing a loss function:
+The surrogate model $h_{\theta}(x)$ is learned through a standard supervised learning procedure. Given a training set $\mathcal{S} 
+= \{(x_i, h(x_i))\}_{i=1}^{m}$, the goal is to determine the parameter vector $\theta$ that minimizes a loss function $L$:
 
 \begin{equation}
     \arg\min_{\theta} \frac{1}{m} \sum_{i=1}^{m} L(h_{\theta}(x_i), y_i^*)
 \end{equation}
 
-where $y_i^*$ are the ground-truth labels (or targets, in case of regression) of each data point in the training set 
-$\mathcal{S}$ and $L$ is the loss function (e.g., $L_1$ or $L_2$ loss for scalar $y$'s).
+where $y_i^*$ are the ground-truth values (i.e., target outputs for regression tasks) and $L$ is a predefined loss function, 
+such as the $L_1$ or $L_2$ loss, depending on the nature of $y$.
 
-The way in which HADA works can then be summarized in three main phases:
+\subsection{Workflow of HADA}
+
+The HADA framework follows a structured three-phase approach:
+
 \begin{enumerate}
-    \item \textit{Data Set Collection} - an initial phase to collect the data set $\mathcal{S}$ by running multiple times the target algorithms, 
-    under different configuration, which we call the \textit{Benchmark} phase. This implies running the algorithms with different configurations on different Hardware platforms;
-    \item \textit{Surrogate Model Creation} - once a training set is available, a set of ML models is then trained on such data. These are the $h_{\theta}$ surrogate models.
-    Then, these models are encoded as a set of variables and constraints following the EML paradigm;
-    \item \textit{Optimization} - post the user-defined constraints and objective function on top of the combinatorial structure
-    formed by the encoded ML models and the domain-knowledge constraints, and finally solve the optimization model 
-    (either until an optimal solution or a time limit is reached).
+    \item \textbf{Data Collection (Benchmarking)}: In this initial phase, multiple runs of the target algorithm are conducted across 
+    different configurations, varying both hyperparameters and hardware settings. The purpose is to gather empirical performance data 
+    that will serve as the basis for training surrogate models.
+    \item \textbf{Surrogate Model Training}: Once the dataset $\mathcal{S}$ is constructed, ML models are trained on the collected 
+    data to learn the performance patterns. These models approximate the function $h_{\theta}(x)$ and are subsequently encoded into 
+    a structured optimization problem following the EML paradigm.
+    \item \textbf{Optimization}: The final phase involves solving the optimization problem, where user-defined constraints and an 
+    objective function are applied on top of the learned surrogate models and expert-defined constraints. The solver searches for 
+    the best combination of algorithmic and hardware configurations that meet the specified constraints while minimizing the 
+    objective function (e.g., energy consumption or execution time).
 \end{enumerate}
 
-The creation of the \textit{Surrogate Model} and the \textit{Optimization} phase are already implemented by the HADA prototype that
-will be presented in chapter 5. Our main goal is then to run a set of algorithms under different configurations, in terms of hyper-parameters and 
-Hardware platform, recording a series of metrics that describe Resource Usage, Energy Consumption and Carbon Emissions (i.e. the Carbon Footprint), which will be
-our targets for the surrogate models. First, we need to understand how the Carbon Footprint of an algorithm is measured.
+\subsection{Extending HADA for Energy and Carbon Footprint Optimization}
+
+The core functionalities of \textit{Surrogate Model Training} and \textit{Optimization} are already implemented in the existing 
+HADA prototype, which will be detailed in Chapter 5. Our primary contribution in this work is to extend HADA by incorporating 
+additional metrics—\textbf{Resource Utilization, Energy Consumption, and Carbon Emissions}—into the empirical modeling process.
+
+To achieve this, we systematically execute a variety of algorithms under diverse configurations (both in terms of hyperparameters 
+and hardware platforms) while recording key performance metrics. These metrics serve as the target variables for the surrogate 
+models, allowing us to model the energy footprint and environmental impact of computational workloads. Before implementing this 
+extension, however, it is necessary to establish a framework for accurately measuring the Carbon Footprint of an AI algorithm. 
+This is the focus of the next section.
 
 \section{Carbon Footprint of Computation}
 
-The Carbon Footprint of an algorithm depends on two factors: the energy needed to run it and the pollutants emitted when producing 
-such energy. The former depends on the computing resources used (e.g. number of cores, running time, data centre efficiency) 
-while the latter, called carbon intensity, depends on the location and production methods used (e.g. nuclear, gas or coal). 
-The Carbon Intensity is expressed in terms of carbon dioxide equivalent ($\mathsf{CO_2e}$), and summarises the global warming 
-effect of the Greenhouse Gases (GHG) emitted in the determined timeframe \cite{GreenAlgorithms}. According to \cite{courty2024codecarbon}, the carbon footprint can then 
-be computed with the following formula:
+The carbon footprint of an algorithm is determined by two main factors: (1) the energy required to execute it and (2) the emissions 
+produced in generating that energy. The first factor depends on computing resource usage—such as the number of processing cores, 
+execution time, and data center efficiency—while the second, known as \textbf{Carbon Intensity}, is influenced by the energy
+ production methods and geographic location. 
+
+\textbf{Carbon Intensity} quantifies the greenhouse gas (GHG) emissions associated with electricity production, expressed in terms 
+of carbon dioxide equivalent ($\mathsf{CO_2e}$). This metric accounts for the global warming potential of various GHGs emitted over 
+a given timeframe \cite{GreenAlgorithms}. As described in \cite{courty2024codecarbon}, the total carbon footprint of a computational 
+task can be estimated using the following equation:
 
 \begin{equation}
     \mathsf{C} = \mathsf{E} \times \mathsf{CI}
 \end{equation}
 
-Where:
+where:
 
 \begin{itemize}
-    \item $\mathsf{E}$ is the energy consumed by the computational infrastructure: quantified as kilowatt-hours (kWh).
-    \item $\mathsf{CI}$ is the Carbon Intensity of the electricity consumed for computation: quantified as g of \(\mathsf{CO_2e}\) 
-    emitted per kilowatt-hour of electricity.
+    \item $\mathsf{E}$ represents the total energy consumed by the computational infrastructure, measured in kilowatt-hours (kWh).
+    \item $\mathsf{CI}$ represents the carbon intensity of the electricity consumed, measured in grams of $\mathsf{CO_2e}$ per 
+    kilowatt-hour (g$\mathsf{CO_2e}$/kWh).
 \end{itemize}
 
-Codecarbon directly measures the energy consumption of the CPU, GPU and RAM on which the code is executed at intervals of 15 sec 
-by default. It also monitor the duration of code execution to compute the total electricity 
-consumption. Then it retrieves information about the carbon intensity of the electricity in your geographic area based on the 
-location. Carbon Intensity of the consumed electricity is calculated as a weighted average of the emissions from the different
-energy sources that are used to generate electricity, including fossil fuels and renewables. In CodeCarbon, the fossil fuels coal, 
-petroleum, and natural gas are associated with specific carbon intensities: a known amount of carbon dioxide is emitted for each 
-kilowatt-hour of electricity generated. Renewable or low-carbon fuels include e.g. solar power, hydroelectricity, biomass, geothermal.
-Based on the mix of energy sources in the local grid, this package calculates the Carbon Intensity of the electricity consumed. 
-The sources for Carbon Intensity data can vary depending on the platform and availability. For example, on private infrastructures,
-CodeCarbon uses data from Our World In Data \cite{ember2024carbonintensity}. Figure \ref{fig:carbon_intensity} visualizes data about the Carbon Intensity of each country as of
-2023.
+\subsection{Measuring Carbon Footprint with CodeCarbon}
+
+\textbf{CodeCarbon} is an open-source tool designed to estimate the carbon footprint of computational workloads. It achieves this 
+by directly measuring energy consumption from key hardware components—CPU, GPU, and RAM—at regular intervals (default: every 15 
+seconds). Additionally, it tracks execution time to compute the total electricity usage of the system.
+
+A distinguishing feature of CodeCarbon is its ability to incorporate region-specific \textbf{Carbon Intensity} data to provide 
+location-dependent emission estimates. Carbon intensity is computed as a weighted average of the emissions from various energy 
+sources used to generate electricity. These sources can be categorized into:
+\begin{itemize}
+    \item \textbf{Fossil Fuels}: Coal, petroleum, and natural gas—each associated with specific carbon intensities, meaning a known 
+    quantity of carbon dioxide is emitted per kilowatt-hour of electricity generated.
+    \item \textbf{Renewable and Low-Carbon Energy}: Solar, wind, hydroelectricity, biomass, geothermal, and nuclear power—sources 
+    with significantly lower or near-zero carbon emissions.
+\end{itemize}
+
+Depending on the platform and data availability, CodeCarbon retrieves carbon intensity information from various sources. For private 
+infrastructures, it relies on datasets such as those provided by Our World In Data \cite{ember2024carbonintensity}. Figure
+\ref{fig:carbon_intensity} illustrates the carbon intensity of electricity generation by country as of 2023.
 
 \begin{figure}
     \includegraphics[width=\linewidth]{imgs/carbon-intensity-electricity.png}
-    \caption{Carbon intensity of electricity generation, 2023. Source \cite{ember2024carbonintensity}}
+    \caption{Carbon intensity of electricity generation, 2023. Source: \cite{ember2024carbonintensity}}
     \label{fig:carbon_intensity}
 \end{figure}
+
+By integrating real-time hardware usage monitoring with location-based carbon intensity data, CodeCarbon enables researchers 
+and practitioners to quantify the environmental impact of their computations. This information can help guide decision-making, 
+such as optimizing code efficiency, choosing lower-carbon data centers, or scheduling workloads during periods of higher renewable 
+energy availability.
 
 \section{Extending HADA with CodeCarbon}
 
@@ -291,7 +368,8 @@ Carbon Footprint. We then added the following metrics taken from CodeCarbon:
     \item \verb|emission_rate|: the amount of $\mathsf{CO_2e}$ emissions per second (kg/s);
     \item \verb|cpu_energy|: the energy consumed by the cpu;
     \item \verb|ram_energy|: the energy consumed by the ram;
-    \item \verb|tot_energy|: the total energy consumed;
+    \item \verb|tot_energy|: the total energy consumed, which is the sum of \verb|cpu_energy| and \verb|ram_energy|. When present
+    it also includes the energy consumed by the GPU;
     \item \verb|country| and \verb|region|: the country and region where the computation took place;
     \item \verb|cpu_count|: the number of cores.
 \end{itemize}
