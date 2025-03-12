@@ -340,91 +340,158 @@ energy availability.
 
 \subsection{Energy Management Algorithms}
 
-The first step to extend HADA with Carfon Intensity is therefore to gather a dataset which includes data about carbon footprint 
-of the algorithms execution, integrating CodeCarbon in code for running our algorithms. The first two algorithms that were analysed 
-are ANTICIPATE and CONTINGENCY, introduced in \cite{ijcai2019p150} \cite{10.1007/978-3-319-93031-2_8} and used in the HADA paper to present the framework \cite{DEFILIPPO2022109199}.
-These are two Stochastic Algorithms from the energy management system domain, which calculate the amount of energy that must be 
-produced by the energy system to meet the required load, minimising the total energy cost over the daily time horizon and by taking 
-into account the uncertainty. In particular, ANTICIPATE is an online (scenario-based) anticipatory algorithm, while CONTINGENCY 
-is an integrated offline/online algorithm that tackles the uncertainty by building (offline) a pool of solutions to guide an 
-efficient online method. Both these methods are characterized by a parameter that can be changed based on the required constraints
-in terms of time constraint and required solution quality (resp., the number of scenarios for ANTICIPATE, and the number of traces 
-for CONTINGENCY). The goal of HADA is to learn the relationship between this configuration parameter and a series of performance
-metrics which describes the Resource Usage of the Algorithm and the quality of the solution. The dataset used originally in HADA then
-includes the following attributes:
+The first step in extending HADA to incorporate Carbon Intensity is to construct a dataset that includes carbon footprint data from 
+algorithm execution. This requires integrating \textbf{CodeCarbon} into the computational workflow used for running algorithms. 
+
+For this study, we analyzed two algorithms: \textbf{ANTICIPATE} and \textbf{CONTINGENCY}, originally introduced in 
+\cite{ijcai2019p150, 10.1007/978-3-319-93031-2_8} and previously used in the HADA framework paper \cite{DEFILIPPO2022109199}. 
+These algorithms belong to the domain of \textbf{Energy Management Systems} and are designed to compute the amount of energy 
+that must be generated to meet a required load while minimizing the total energy cost over a daily time horizon. Both methods
+consider the inherent uncertainty in energy demand and production.
 
 \begin{itemize}
-    \item \verb|nParam|: Value of the algorithm configuration parameter, i.e. \verb|nScenarios| For ANTICIPATE and \verb|nTraces| for CONTINGENCY;
-    \item \verb|time(s)|: Time required to find a solution;
-    \item \verb|sol(keuro)|: Cost of the solution found (expresses solution quality);
-    \item \verb|memAvg(MB)|: Average memory used by the algorithm.
+    \item \textbf{ANTICIPATE} is an \textit{online}, scenario-based anticipatory algorithm that adapts dynamically to uncertainty.
+    \item \textbf{CONTINGENCY} is a hybrid \textit{offline/online} approach that first constructs (offline) a pool of solutions, 
+    which is then used to guide an efficient online decision-making process.
 \end{itemize}
 
-As already mentioned, we would like to extend this work by considering also the algorithm performance in terms of Energy Consumption and
-Carbon Footprint. We then added the following metrics taken from CodeCarbon:
+Both methods are characterized by a tunable configuration parameter that can be adjusted based on performance constraints, 
+particularly execution time and solution quality:
+\begin{itemize}
+    \item For \textbf{ANTICIPATE}, the configuration parameter is the number of considered \textit{scenarios} (\verb|nScenarios|).
+    \item For \textbf{CONTINGENCY}, it is the number of \textit{traces} (\verb|nTraces|).
+\end{itemize}
+
+The goal of HADA is to learn the relationship between this configuration parameter and various performance metrics that characterize 
+algorithm efficiency and resource usage. The original dataset used in HADA includes the following attributes:
 
 \begin{itemize}
-    \item \verb|emissions|: the total emissions of $\mathsf{CO_2e}$ (kg)
-    \item \verb|emission_rate|: the amount of $\mathsf{CO_2e}$ emissions per second (kg/s);
-    \item \verb|cpu_energy|: the energy consumed by the cpu;
-    \item \verb|ram_energy|: the energy consumed by the ram;
-    \item \verb|tot_energy|: the total energy consumed, which is the sum of \verb|cpu_energy| and \verb|ram_energy|. When present
-    it also includes the energy consumed by the GPU;
-    \item \verb|country| and \verb|region|: the country and region where the computation took place;
-    \item \verb|cpu_count|: the number of cores.
+    \item \verb|nParam|: The configuration parameter of the algorithm (\verb|nScenarios| for ANTICIPATE, \verb|nTraces| for 
+    CONTINGENCY).
+    \item \verb|time(s)|: Execution time required to find a solution.
+    \item \verb|sol(keuro)|: Cost of the obtained solution (expressed in thousand euros), serving as a measure of solution quality.
+    \item \verb|memAvg(MB)|: Average memory usage of the algorithm (in MB).
 \end{itemize}
 
-In addition to these, we also implemented the tracking of the peak memory usage (which we called \verb|memPeak(MB)| in the dataset).
+\subsection{Incorporating Energy and Carbon Footprint Metrics}
+
+To extend this approach, we integrated additional metrics related to \textbf{energy consumption} and \textbf{carbon footprint}, 
+leveraging the capabilities of CodeCarbon. The following attributes were added to the dataset:
+
+\begin{itemize}
+    \item \verb|emissions|: Total $\mathsf{CO_2e}$ emissions generated during execution (kg).
+    \item \verb|emission_rate|: Rate of $\mathsf{CO_2e}$ emissions per second (kg/s).
+    \item \verb|cpu_energy|: Energy consumed by the CPU (kWh).
+    \item \verb|ram_energy|: Energy consumed by RAM (kWh).
+    \item \verb|tot_energy|: Total energy consumption (kWh), which is the sum of \verb|cpu_energy| and \verb|ram_energy|. If 
+    applicable, it also includes GPU energy consumption.
+    \item \verb|country| and \verb|region|: Geographic location where the computation took place, used to determine the carbon 
+    intensity of electricity.
+    \item \verb|cpu_count|: Number of CPU cores used.
+\end{itemize}
+
+Additionally, we implemented tracking for the peak memory usage of each execution, which we included in the dataset under the 
+attribute:
+
+\begin{itemize}
+    \item \verb|memPeak(MB)|: Maximum memory usage (in MB) recorded during execution.
+\end{itemize}
+
+By incorporating these additional metrics, HADA can now model not only algorithm efficiency and solution quality but also the 
+environmental impact of computational workloads. This enhancement allows for a more comprehensive optimization approach, balancing 
+performance requirements with sustainability considerations.
 
 \subsection{Min-Cut/Max-Flow Algorithms}
 
-After ANTICIPATE and CONTINGENCY, that were already included in HADA, we decided that it would be interesting to further extend HADA
-with new algorithms. We opted for a set of algorithms used to solve Minimum Cut/Maximum Flow problems on Graphs, that are used for a4paper
-number of Computer Vision tasks. We reffered to the work of Jensen et al. (2023) \cite{Jensen2023Maxflow}, that offers a review of 
-Min-Cut/Max-Flow state-of-the-art algorithms, evaluated on a large Dataset of Computer Vision problems. In particular, we focused on
-three algorithms:
+Following our initial experiments with ANTICIPATE and CONTINGENCY, which were already included in HADA, we sought to extend our 
+study to a broader class of algorithms. We selected a set of algorithms used to solve the \textbf{Minimum Cut/Maximum Flow 
+(Min-Cut/Max-Flow)} problem in graphs, a fundamental problem in combinatorial optimization with widespread applications in various 
+domains, particularly in \textbf{Computer Vision}. 
+
+The Min-Cut/Max-Flow problem involves computing the maximum amount of flow that can be sent from a designated source node to a 
+ink node in a flow network, subject to capacity constraints on edges. The \textbf{Max-Flow} problem seeks to maximize the total 
+flow, while the \textbf{Min-Cut} problem finds the smallest set of edges that, if removed, would disconnect the source from the sink. 
+The Max-Flow problem and the Min-Cut problem are closely related, as stated by the \textbf{Max-Flow Min-Cut Theorem}, which asserts 
+that the maximum flow value in a network is equal to the capacity of the minimum cut.
+
+Min-Cut/Max-Flow algorithms are widely used in image segmentation, stereo vision, and other Computer Vision tasks where images are 
+represented as graphs, and energy minimization techniques are applied to solve labeling problems. We referred to the work of Jensen 
+et al. (2023) \cite{Jensen2023Maxflow}, which provides a comprehensive review of state-of-the-art Min-Cut/Max-Flow algorithms, 
+evaluated on a large dataset of Computer Vision problems. 
+
+\subsubsection{Selected Algorithms}
+
+Based on the findings of Jensen et al., we focused on three well-known Min-Cut/Max-Flow algorithms, each representing different 
+families of flow-based optimization methods:
 
 \begin{itemize}
-\item Boykov-Kolmogorov (BK)
-\item Excess Incremental Breadth First Search (EIBFS)
-\item Hochbaum's Pseudo Flow (HPF)
+    \item \textbf{Boykov-Kolmogorov (BK)}
+    \item \textbf{Excess Incremental Breadth First Search (EIBFS)}
+    \item \textbf{Hochbaum's Pseudo-Flow (HPF)}
 \end{itemize}
 
-Accoring to Jensen et al. there are different families of Min-Cut/Max-Flow algorithms. BK belongs to the so called Augmenting Paths (AP)
-family, which is the oldest one, introduced with the Ford-Fulkerson Algorithm [insert citation]. Instead, EIBFS and HPF are from the family of the so 
-called \textit{Pseudoflow} algorithms [insert citation]. The main differences are the order in which they scan through nodes when looking for an arc 
-connecting two trees in the forest, and how they push flow along the paths.
+According to Jensen et al., Min-Cut/Max-Flow algorithms can be broadly classified into different families based on their approach 
+to augmenting paths and flow computation. The \textbf{Boykov-Kolmogorov} (BK) algorithm \cite{bk2004maxflow} belongs to the \textbf{Augmenting Paths 
+(AP)} family, which is one of the oldest methods for solving the Max-Flow problem. This family dates back to the classical 
+\textbf{Ford-Fulkerson Algorithm} \cite{ford1956maxflow}, which introduced the concept of augmenting paths to iteratively 
+increase the flow. BK extends this approach by introducing heuristic techniques to improve efficiency, making it particularly 
+effective for Computer Vision applications.
 
-Differently from ANTICIPATE and CONTINGENCY, these algorithms does not have a configuration parameter. Since these three algorithms can 
-be implemented in different variants, we decided to treat the algorithm's implementation type as a configuration parameter. The variants considered
-are the following:
+On the other hand, \textbf{Excess Incremental Breadth First Search (EIBFS)} \cite{goldberg2015faster} and \textbf{Hochbaum’s 
+Pseudo-Flow (HPF)} \cite{hochbaum2008pseudoflow} belong to the \textbf{Pseudoflow} family, which differs from augmenting path 
+methods in the way it manages flow excess. These algorithms prioritize maintaining a valid preflow at all times and use alternative 
+strategies to push flow across the network, often improving efficiency in large-scale instances. 
+
+The main differences between these algorithm families lie in the order in which they traverse nodes while searching for augmenting 
+paths and in their mechanisms for pushing flow along paths in the graph.
+
+\subsubsection{Algorithm Variants Considered}
+
+Unlike ANTICIPATE and CONTINGENCY, which have explicit tunable configuration parameters, these Min-Cut/Max-Flow algorithms can 
+be implemented with different optimizations \cite{Jensen2023Maxflow}. We treated the specific implementation variant of each algorithm as a configuration 
+parameter and considered the following versions:
 
 \begin{itemize}
-    \item For Boykov-Kolmogorov we considered:
+    \item \textbf{Boykov-Kolmogorov (BK) Variants:}
     \begin{itemize}
-        \item The reference implementation (BK);
-        \item The implementation by Jensen et al. (MBK), with several optimisations, such as using indices instead of pointers to reduce memory footprint;
-        \item A second implementation by Jensen et al. (MBK-R) which reorders arcs, so that all outgoing arcs from a node are adjacent in memory.
+        \item \textbf{BK}: The reference implementation.
+        \item \textbf{MBK}: An optimized version by Jensen et al., using indices instead of pointers to reduce memory footprint.
+        \item \textbf{MBK-R}: A second optimized version that reorders arcs to ensure that all outgoing edges from a node are 
+        stored contiguously in memory.
     \end{itemize}
-    \item For Excess Incremental Breadth First Search we considered:
+    \item \textbf{Excess Incremental Breadth First Search (EIBFS) Variants:}
     \begin{itemize}
-        \item A slightly modified version of original algorithm (EIBFS);
-        \item A second version replacing pointers with indices (EIBFS-I);
-        \item A third version without arc reordering (EIBFS-I-NR).
+        \item \textbf{EIBFS}: A slightly modified version of the original EIBFS algorithm.
+        \item \textbf{EIBFS-I}: A version that replaces pointers with indices to improve memory locality.
+        \item \textbf{EIBFS-I-NR}: A version similar to EIBFS-I but without arc reordering.
     \end{itemize}
-    \item For Hochbaum's Pseudo Flow we considered:
+    \item \textbf{Hochbaum’s Pseudo-Flow (HPF) Variants:}
     \begin{itemize}
-        \item Highest label variant, with FIFO buckets (HPF-H-F);
-        \item Highest label variant, with LIFO buckets (HPF-H-L);
-        \item Lowest label variant, with FIFO buckets (HPF-L-F);
-        \item Lowest label variant, with LIFO buckets (HPF-L-L).
+        \item \textbf{HPF-H-F}: Highest-label variant using FIFO buckets.
+        \item \textbf{HPF-H-L}: Highest-label variant using LIFO buckets.
+        \item \textbf{HPF-L-F}: Lowest-label variant using FIFO buckets.
+        \item \textbf{HPF-L-L}: Lowest-label variant using LIFO buckets.
     \end{itemize}
 \end{itemize}
 
-Jensen et al. provided a series of scripts to evaluate the runtime of those algorithms - considering both the initialization time and the time required
-to come up with a solution. In order to monitor our target metrics, we wrapped the algorithms scripts - which are implemented in C++ code - with a Python
-script that implements memory usage tracking and uses CodeCarbon to monitor Energy Usage and Carbon Emissions. Differently from ANTICIPATE and CONTINGENCY
-here we do not take the solution quality into consideration.
+\subsubsection{Energy and Carbon Footprint Monitoring}
+
+Jensen et al. provided scripts to evaluate the runtime performance of these algorithms, measuring both initialization time and 
+execution time. To extend this analysis with energy consumption and carbon footprint tracking, we modified their experimental 
+setup by integrating \textbf{CodeCarbon}. 
+
+Since the original implementations are written in C++, we wrapped the algorithm scripts with a Python interface to facilitate 
+real-time monitoring. This wrapper was designed to:
+\begin{itemize}
+    \item Track memory usage throughout execution.
+    \item Use CodeCarbon to measure CPU and RAM energy consumption.
+    \item Record $\mathsf{CO_2e}$ emissions based on the energy consumption and Carbon Intensity of the execution environment.
+\end{itemize}
+
+Unlike the experiments with ANTICIPATE and CONTINGENCY, where solution quality was a critical performance metric, here we focus 
+solely on computational efficiency. The primary metrics of interest for this study are execution time, memory consumption, energy 
+consumption, and environmental impact. By incorporating these Min-Cut/Max-Flow algorithms into HADA, we aim to explore 
+energy-efficient graph-based optimization techniques and further refine our approach to sustainable AI computation.
 
 \chapter{Experimental Analysis}
 
@@ -453,7 +520,7 @@ ANTICIPATE and CONTINGENCY were executed on 30 instances which were sampled with
 On each instance, each algorithm was executed with parameter (i.e. number of traces or scenarios) values ranging from 1 to 100. For ANTICIPATE and CONTINGENCY we
 used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a dataset with a total of $30 \times 100 \times 2 \times 2 = 12,000$ entries. 
 
-To generate a benchmark dataset for the Min-Cut/Max-Flow algorithms, we relied on the dataset provided by [Insert source]. This is an extensive collection of instances
+To generate a benchmark dataset for the Min-Cut/Max-Flow algorithms, we relied on the dataset provided by Jensen et al. (2023) \cite{Jensen2023Maxflow}. This is an extensive collection of instances
 of Min-Cut/Max-Flow problems in the Computer Vision field. The authors also provided the implementations of the algorithms that were used to generate our benchmark data.
 Since they are implemented in C++ (BK and EIBFS) and C (HPF), we faced the problem of how to track the energy consumption and thus the emissions of such code. Apparently,
 there are not much tool available to monitor the emissions of C code. % TODO: expand this in the RELATED WORK SECTION.
