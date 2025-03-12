@@ -584,46 +584,6 @@ Here we can see some results given by the HADA framework tested on the updated d
 presents the results of optimising any target without any constraints for ANTICIPATE. We can notice how, for most metrics keeping the number of scenarios
 as low as possible is the best choice, while increasing them brings the solution cost down.
 
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|ccc|}
-        \hline
-        \multicolumn{1}{|c|}{Objective} & \multicolumn{3}{c|}{Solution} \\
-        \hline
-        Target & $n^P$ & HW & Value \\
-        \hline
-        CO2e (kg) & 1 & mbp19 & $7.23 \times 10^{-6}$ \\
-        Cost (€) & 97 & mbp19 & $267.39k$ \\
-        Time (s)& 1 & mbp19 & $1.24$ \\
-        Avg. Memory (MB) & 1 & mbp19 & $81.47$ \\
-        Peak Memory (MB) & 2 & mpb19 & $92.19$ \\
-        Energy (kW) & 1 & mbp19 & $2.12$ \\
-        \hline
-    \end{tabular}
-    \caption{Minimum values for each target for the ANTICIPATE algorithm}
-    \label{tab:anticipate_min_targets}
-\end{table}
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|ccc|}
-        \hline
-        \multicolumn{1}{|c|}{Objective} & \multicolumn{3}{c|}{Solution} \\
-        \hline
-        Target & $n^P$ & HW & Value \\
-        \hline
-        CO2e (kg) & 2 & mbp19 & $1.28 \times 10^{6}$ \\
-        Cost (€) & 90 & mbp19 & $314.11k$ \\
-        Time (s)& 1 & mbp19 & $5.16$ \\
-        Avg. Memory (MB) & 1 & mbp19 & $117.66$ \\
-        Peak Memory (MB) & 2 & mbp19 & $130.58$ \\
-        Energy (kW) & 2 & mbp19 & $3.77 \times 10^{-6}$ \\
-        \hline
-    \end{tabular}
-    \caption{Minimum values for each target for the CONTINGENCY algorithm}
-    \label{tab:contingency_min_targets}
-\end{table}
-
 As we can see in \ref{fig:ant_corr_mat}, \verb|totEnergy| has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions,
 as measured by CodeCarbon, depends by two factors, i.e. the energy consumed by running the algorithm and the Carbon Intensity. Since we executed all the experiments in the same
 country, the Carbon Intensity over the whole dataset is fixed, meaning that the only factor influencing the CO2e emissions is the energy consumed, while the Carbon Intensity
@@ -686,7 +646,73 @@ So we will try to test HADA on CONTINGENCY with constraints on the Runtime (expr
     \label{tab:contingency_results}
 \end{table}
 
-\subsection{Min-Cut/Max-Flow Algorithms} 
+\subsection{Min-Cut/Max-Flow Algorithms}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|ccc|cccc|}
+        \hline
+        \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
+        \hline
+        Nodes & Arcs & time(s) & Impl. & HW & CO2e & time(s) \\
+        \hline
+        40 & 400 & $0.1$ & MBK & pc & $4.38 \times 10^{-7}$ & $3.80 \times 10^{-5}$ \\
+        120 & 2k & $0.1$ & MBK2 & pc & $4.40 \times 10^{-7}$ & $5.10 \times 10^{-5}$ \\
+        1k & 5k & $0.1$ & MBK & pc & $4.40 \times 10^{-7}$ & $4.09 \times 10^{-4}$ \\
+        10k & 62k & $0.1$ & BK & pc & $4.40 \times 10^{-7}$ & $2.63 \times 10^{-3}$ \\
+        44k & 784k & $5$ & MBK2 & pc & $6.46 \times 10^{-6}$ & $1.39$ \\
+        185k & 5M & $5$ & MBK2 & pc & $2.16 \times 10^{-6}$ & $0.28$ \\
+        18M & 93M & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$& $9.79k$ \\
+        143M & 1B & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$ & $9.79k$ \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the BK algorithm}
+    \label{tab:bk_results}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|ccc|cccc|}
+        \hline
+        \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
+        \hline
+        Nodes & Arcs & time(s) & Impl. & HW & CO2e & time(s) \\
+        \hline
+        40 & 400 & $0.1$ & EIBFS new & pc & $4.37 \times 10^{-7}$ & $3.75 \times 10^{-5}$ \\
+        120 & 2k & $0.1$ & EIBFS new & pc & $4.40 \times 10^{-7}$ & $1.80 \times 10^{-4}$ \\
+        1k & 5k & $0.1$ & EIBFS new & pc & $4.40 \times 10^{-7}$ & $2.03 \times 10^{-4}$ \\
+        10k & 62k & $0.1$ & EIBFS old & pc & $4.40 \times 10^{-7}$ & $2.89 \times 10^{-3}$ \\
+        44k & 784k & $0.5$ & EIBFS new & pc & $8.7 \times 10^{-7}$ & $0.27$ \\
+        185k & 5M & $0.5$ & EIBFS new2 & pc & $1.30 \times 10^{-6}$ & $0.12$ \\
+        18M & 93M & $5$ & EIBFS new & pc & $1.98 \times 10^{-5}$& $3.51$ \\
+        143M & 1B & $10$ & none & none & none & none \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the EIBFS algorithm}
+    \label{tab:eibfs_results}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|ccc|cccc|}
+        \hline
+        \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
+        \hline
+        Nodes & Arcs & memPeak(MB) & Impl. & HW & CO2e & memPeak(MB) \\
+        \hline
+        40 & 400 & $0.1$ & HPF & pc & $4.37 \times 10^{-7}$ & $3.75 \times 10^{-5}$ \\
+        120 & 2k & $0.1$ & HPF & pc & $4.40 \times 10^{-7}$ & $1.80 \times 10^{-4}$ \\
+        1k & 5k & $0.1$ & HPF & pc & $4.40 \times 10^{-7}$ & $2.03 \times 10^{-4}$ \\
+        10k & 62k & $0.1$ & HPF & pc & $4.40 \times 10^{-7}$ & $2.89 \times 10^{-3}$ \\
+        44k & 784k & $0.5$ & HPF & pc & $8.7 \times 10^{-7}$ & $0.27$ \\
+        185k & 5M & $0.5$ & HPF & pc & $1.30 \times 10^{-6}$ & $0.12$ \\
+        18M & 93M & $5$ & HPF & pc & $1.98 \times 10^{-5}$& $3.51$ \\
+        143M & 1B & $10$ & HPF & none & none & none \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the EIBFS algorithm}
+    \label{tab:hpf_results}
+\end{table}
 
 \begin{figure}[h!]
     \centering

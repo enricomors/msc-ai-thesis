@@ -1,10 +1,10 @@
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"contingency",
+{"algorithm":"bk",
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "time(sec)", "type": "leq", "value": 240},
-    {"target": "sol(keuro)", "type": "leq", "value": 370}
+    {"target": "time(s)", "type": "leq", "value": 240},
+    {"target": "memAvg(MB)", "type": "leq", "value": 370}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
@@ -18,11 +18,11 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"contingency",
+{"algorithm":"bk",
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "time(sec)", "type": "leq", "value": 10}
+    {"target": "memAvg(MB)", "type": "leq", "value": 10}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
@@ -36,25 +36,23 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"contingency",
+{"algorithm":"hpf",
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "sol(keuro)", "type": "leq", "value": 350}
+    {"target": "time(s)", "type": "leq", "value": 0.1}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
 ],
 "inputs": [
-    {"name":"load_std", "value": 167},
-    {"name":"load_mean", "value": 314},
-    {"name":"pv_std", "value": 276},
-    {"name":"pv_mean", "value": 268}
+    {"name":"nodes", "value": 40},
+    {"name":"arcs", "value": 400}
 ], 
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"contingency",
+{"algorithm":"bk",
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [],
@@ -62,9 +60,7 @@ curl -X POST -H 'Content-Type: application/json' -d '
     {"hw":"pc", "price": 100}
 ],
 "inputs": [
-    {"name":"load_std", "value": 167},
-    {"name":"load_mean", "value": 314},
-    {"name":"pv_std", "value": 276},
-    {"name":"pv_mean", "value": 268}
+    {"name":"nodes", "value": 135433},
+    {"name":"arcs", "value": 1396830}
 ], 
 "country": "Italy"}' localhost:5000/optimize

@@ -1,0 +1,6 @@
+{
+    "inputs": [
+        {"name":"nodes", "value": 10000},
+        {"name":"arcs", "value": 50000}
+    ]
+}
