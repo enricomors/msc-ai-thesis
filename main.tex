@@ -497,71 +497,109 @@ energy-efficient graph-based optimization techniques and further refine our appr
 
 \section{Benchmarking on Different Hardware Platforms}
 
-For the benchmark phase, we opted for running the algorithms on different Hardware Platforms, in order to better capture the differences in performance
-when changing the machine on which the algorithm is executed:
+To comprehensively evaluate the performance of the selected algorithms under varying computational environments, we conducted experiments on multiple hardware platforms. This approach allows us to better capture how changes in hardware configurations impact execution time, energy consumption, and carbon footprint.
 
-Experiments were conducted on:
+\subsection{Experimental Setup}
+
+The benchmark phase was carried out on the following computing environments:
+
 \begin{itemize}
-\item \verb|mbp19|: A Laptopr running MacOS Ventura 13.6.7 with:
+    \item \verb|mbp19|: A personal laptop running MacOS Ventura 13.6.7, equipped with:
     \begin{itemize}
-        \item 1,4 GHz Quad-Core Intel Core i5;
-        \item 8 GB 2133 MHz LPDDR3;
+        \item 1.4 GHz Quad-Core Intel Core i5 processor;
+        \item 8 GB 2133 MHz LPDDR3 RAM.
     \end{itemize}
-\item \verb|PC|: A PC with Ubuntu 22.0.4 LTS
-\item \verb|leonardo| An HPC infrastructure, i.e. Leonardo hosted by CINECA. It has a total of 4992 computing nodes organized in two partitions, the Booster partition and the Data Centric General Purpose (DCGP) partition. For running the benchmark phase we used the booster partition, which has the following specifics:
+    
+    \item \verb|PC|: A desktop computer running Ubuntu 24.4 LTS, featuring:
     \begin{itemize}
-        \item 8×64 GB DDR4 3200 MHz (512 GB)
-        \item single socket 32-core Intel Xeon Platinum 8358 CPU, 2.60GHz (Ice Lake) (110592 cores).
-        \item 4x NVIDIA custom Ampere A100 GPU 64GB HBM2e, NVLink 3.0 (200GB/s)
+        \item 3.4 GHz Intel Core i7-4770 Quad-Core processor;
+        \item 8 GB DDR3 RAM.
+    \end{itemize}
+    
+    \item \verb|leonardo|: A high-performance computing (HPC) infrastructure, \textbf{Leonardo}, hosted by \textbf{CINECA}. Leonardo consists of 4992 computing nodes, distributed across two primary partitions: 
+    \begin{itemize}
+        \item \textbf{Booster partition} – used for this study – with:
+        \begin{itemize}
+            \item 512 GB (8 × 64 GB DDR4 3200 MHz) RAM per node;
+            \item Single-socket, 32-core Intel Xeon Platinum 8358 CPU, 2.60 GHz (Ice Lake) (110,592 total cores);
+            \item 4× NVIDIA custom Ampere A100 GPUs with 64 GB HBM2e memory, NVLink 3.0 (200 GB/s).
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 
-ANTICIPATE and CONTINGENCY were executed on 30 instances which were sampled with a statistical model with a Gaussian distribution \cite{DEFILIPPO2022109199}.
-On each instance, each algorithm was executed with parameter (i.e. number of traces or scenarios) values ranging from 1 to 100. For ANTICIPATE and CONTINGENCY we
-used only \verb|mbp19| and \verb|leonardo|. Thus in the end we obtained a dataset with a total of $30 \times 100 \times 2 \times 2 = 12,000$ entries. 
+\subsection{Benchmarking ANTICIPATE and CONTINGENCY}
 
-To generate a benchmark dataset for the Min-Cut/Max-Flow algorithms, we relied on the dataset provided by Jensen et al. (2023) \cite{Jensen2023Maxflow}. This is an extensive collection of instances
-of Min-Cut/Max-Flow problems in the Computer Vision field. The authors also provided the implementations of the algorithms that were used to generate our benchmark data.
-Since they are implemented in C++ (BK and EIBFS) and C (HPF), we faced the problem of how to track the energy consumption and thus the emissions of such code. Apparently,
-there are not much tool available to monitor the emissions of C code. % TODO: expand this in the RELATED WORK SECTION.
-We opted for using a python wrapper script, that runs the C++/C scripts implementing the algorithms and uses CodeCarbon to track the energy consumption of the script execution.
-For reasons due to lacking support on MacOS, i was not able to compile the BK and EIBFS implementation on mbp19. Instead, i have managed to restore an old PC i had at home 
-with a light distribution of Ubuntu to run some of these scripts. 
-It is important to point out that we did not executed the selected algorithms on the whole dataset, since some of the problem instances were very big, sometimes exceeding the available memory,
-we just ran a subset of them - even if it was possible to create a swap partition big enough to accomodate bigger instances, the monitoring tools available just record the 
-used RAM, so the estimate of the memory usage would be downsized in such cases. Also, due to the large number of instances, running a benchmark phase on all of them would have
-been way too time consuming. 
+For the first set of experiments, we executed \textbf{ANTICIPATE} and \textbf{CONTINGENCY} on a collection of 30 problem instances. These instances were sampled using a Gaussian statistical model, as proposed in \cite{DEFILIPPO2022109199}. 
+
+Each algorithm was executed on every instance with a varying configuration parameter (i.e., the number of \textit{traces} for CONTINGENCY and \textit{scenarios} for ANTICIPATE), ranging from 1 to 100. These experiments were performed on both \verb|mbp19| and \verb|leonardo|. As a result, we generated a dataset containing:
+
+\begin{equation}
+    30 \times 100 \times 2 \times 2 = 12,000 \text{ entries}.
+\end{equation}
+
+This dataset captures execution time, memory consumption, energy usage, and carbon footprint across different algorithmic configurations and hardware platforms.
+
+\subsection{Benchmarking Min-Cut/Max-Flow Algorithms}
+
+To evaluate the performance of the selected \textbf{Min-Cut/Max-Flow} algorithms, we relied on the dataset provided by Jensen et al. (2023) \cite{Jensen2023Maxflow}. This dataset contains a diverse set of Min-Cut/Max-Flow problem instances from the field of Computer Vision, allowing for a thorough assessment of algorithmic efficiency in real-world applications. Jensen et al. also provided reference implementations of the algorithms, which we used for benchmarking.
+
+Since these implementations were written in \textbf{C++} (for BK and EIBFS) and \textbf{C} (for HPF), integrating energy consumption tracking posed a challenge. Currently, few tools are available for directly monitoring the energy footprint of compiled C/C++ code. % TODO: Expand this discussion in the Related Work section.
+
+To address this issue, we developed a \textbf{Python wrapper script} that executes the C++/C implementations and integrates \textbf{CodeCarbon} for energy and emission tracking. The wrapper allows us to monitor:
+\begin{itemize}
+    \item Execution time and memory usage;
+    \item CPU and RAM energy consumption;
+    \item $\mathsf{CO_2e}$ emissions based on real-time energy monitoring and Carbon Intensity data.
+\end{itemize}
+
+\subsection{Execution Constraints and Limitations}
+
+While our goal was to run the selected algorithms on all instances of the Jensen et al. dataset, several factors constrained the scope of our experiments:
+
+\begin{itemize}
+    \item \textbf{Compilation and Platform Limitations:} The BK and EIBFS implementations could not be compiled on \verb|mbp19| due to missing dependencies and a lack of support for MacOS. To address this, we utilized an alternative system—\verb|PC|—running a lightweight Ubuntu distribution, enabling execution on additional hardware.
+    
+    \item \textbf{Memory Constraints:} Some problem instances in the dataset were too large to fit within the available system memory. Although it was technically possible to use a swap partition to accommodate larger instances, this would have distorted memory usage measurements, as available monitoring tools record only RAM consumption and do not account for swapped memory.
+    
+    \item \textbf{Execution Time Considerations:} Given the extensive number of instances in the dataset, running all of them would have been prohibitively time-consuming. As a result, we selected a representative subset of problem instances that allowed us to evaluate performance across a range of complexity levels without exceeding computational constraints.
+\end{itemize}
+
+By executing experiments across multiple hardware platforms and addressing challenges related to execution and monitoring, we constructed a dataset that provides insights into algorithmic efficiency, energy consumption, and carbon emissions. The following sections will analyze the results obtained from these experiments and explore the implications of integrating sustainability metrics into algorithm selection and hardware dimensioning.
 
 \subsection{ANTICIPATE and CONTINGENCY}
 
+Emissions with outliers
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/emissions_ant_cont.png}
+    \caption{CO2 emissions for ANTICIPATE and CONGINGENCY ordered by platform}
+    \label{fig:ant_cont_emissions}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/energy_ant_cont.png}
+    \caption{Energy Consumption data for ANTICIPATE and CONTINGENCY}
+    \label{fig:ant_cont_energy}
+\end{figure}
+
 % BOX PLOTS
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{imgs/avg_mem_usage.png}
-    \caption{Average memory usage of ANTICIPATE and CONTINGENCY divided by platform}
-    \label{fig:ant_cont_avg_mem_usage}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{imgs/peak_mem_usage.png}
-    \caption{Peak memory usage of ANTICIPATE and CONTINGENCY divided by platform}
-    \label{fig:ant_cont_peak_mem_usage}
-\end{figure}
+Emissions without outloers (IQR)
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/CO2_emissions_no_outliers.png}
     \caption{CO2 emissions for ANTICIPATE and CONGINGENCY ordered by platform}
-    \label{fig:ant_cont_co2_emissions}
+    \label{fig:ant_cont_emissions_iqr}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/energy_consumption_no_outliers.png}
     \caption{Energy Consumption data for ANTICIPATE and CONTINGENCY}
-    \label{fig:ant_cont_energy}
+    \label{fig:ant_cont_energy_iqr}
 \end{figure}
 
 % CORRELATION MATRICES
@@ -648,6 +686,22 @@ So we will try to test HADA on CONTINGENCY with constraints on the Runtime (expr
 
 \subsection{Min-Cut/Max-Flow Algorithms}
 
+Emissions of BK, EIBFS and HPF
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/max_flow_emissions.png}
+    \caption{CO2 emissions for Min-Cut/Max-Flow algorithms}
+    \label{fig:max_flow_emissions}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/max_flow_emissions_iqr.png}
+    \caption{IQR for the CO2 emissions of Min-Cut/Max-Flow algorithms}
+    \label{fig:max_flow_emissions_iqr}
+\end{figure}
+
 \begin{table}[h!]
     \centering
     \begin{tabular}{|ccc|cccc|}
@@ -662,8 +716,8 @@ So we will try to test HADA on CONTINGENCY with constraints on the Runtime (expr
         10k & 62k & $0.1$ & BK & pc & $4.40 \times 10^{-7}$ & $2.63 \times 10^{-3}$ \\
         44k & 784k & $5$ & MBK2 & pc & $6.46 \times 10^{-6}$ & $1.39$ \\
         185k & 5M & $5$ & MBK2 & pc & $2.16 \times 10^{-6}$ & $0.28$ \\
-        18M & 93M & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$& $9.79k$ \\
-        143M & 1B & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$ & $9.79k$ \\
+        18M & 93M & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$& $9.79$ \\
+        143M & 1B & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$ & $9.79$ \\
         \hline
     \end{tabular}
     \caption{Experimental results for the BK algorithm}
@@ -700,14 +754,15 @@ So we will try to test HADA on CONTINGENCY with constraints on the Runtime (expr
         \hline
         Nodes & Arcs & memPeak(MB) & Impl. & HW & CO2e & memPeak(MB) \\
         \hline
-        40 & 400 & $0.1$ & HPF & pc & $4.37 \times 10^{-7}$ & $3.75 \times 10^{-5}$ \\
-        120 & 2k & $0.1$ & HPF & pc & $4.40 \times 10^{-7}$ & $1.80 \times 10^{-4}$ \\
-        1k & 5k & $0.1$ & HPF & pc & $4.40 \times 10^{-7}$ & $2.03 \times 10^{-4}$ \\
-        10k & 62k & $0.1$ & HPF & pc & $4.40 \times 10^{-7}$ & $2.89 \times 10^{-3}$ \\
-        44k & 784k & $0.5$ & HPF & pc & $8.7 \times 10^{-7}$ & $0.27$ \\
-        185k & 5M & $0.5$ & HPF & pc & $1.30 \times 10^{-6}$ & $0.12$ \\
-        18M & 93M & $5$ & HPF & pc & $1.98 \times 10^{-5}$& $3.51$ \\
-        143M & 1B & $10$ & HPF & none & none & none \\
+        2.5k & 50k & $10$ & HPF-H-F & mbp19 & $2.11 \times 10^{-6}$ & $0.48$ \\
+        10k & 75k & $10$ & HPF-H-F & mbp19 & $4.91 \times 10^{-7}$ & $0.46$ \\
+        100k & 300k & $100$ & HPF-L-L & mbp19 & $9.56 \times 10^{-7}$ & $15.46$ \\
+        300k & 500k & $100$ & HPF-L-L & mbp19 & $1.46 \times 10^{-6}$ & $35.45$ \\
+        1M & 5M & $100$ & none & none & none & none \\
+        1M & 5M & $400$ & HPF-L-L & mpb19 & $8.25 \times 10^{-6}$ & $390.83$ \\
+        10M & 25M & none & none & none & none \\
+        10M & 25M & $3000$ & HPF-H-L & mbp19 & $6.85 \times 10^{-5}$ & $2122.97$ \\
+        125M & 300M & $4000$ & HPF-L-F & mbp19 & $9.08 \times 10^{-3}$ & $3785.29$ \\
         \hline
     \end{tabular}
     \caption{Experimental results for the EIBFS algorithm}
@@ -719,6 +774,28 @@ So we will try to test HADA on CONTINGENCY with constraints on the Runtime (expr
     \includegraphics[width=0.8\textwidth]{imgs/max_flow_corr_mat.png}
     \caption{Correlation matrix for Min-Cut/Max-Flow Algorithms BK, EIBFS and HPF}
     \label{fig:max_flow_corr_mat}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/bk_corr_mat.png}
+    \caption{Correlation matrix for BK}
+    \label{fig:bk_orr_mat}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/eibfs_corr_mat.png}
+    \caption{Correlation matrix for EIBFS}
+    \label{fig:eibfs_corr_mat}
+\end{figure}
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/hpf_corr_mat.png}
+    \caption{Correlation matrix for BK}
+    \label{fig:hpf_flow_corr_mat}
 \end{figure}
 
 \chapter{HADA-as-a-Service}

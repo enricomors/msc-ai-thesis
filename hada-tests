@@ -40,14 +40,14 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "time(s)", "type": "leq", "value": 0.1}
+    {"target": "memPeak(MB)", "type": "leq", "value": 100}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
 ],
 "inputs": [
-    {"name":"nodes", "value": 40},
-    {"name":"arcs", "value": 400}
+    {"name":"nodes", "value": 120},
+    {"name":"arcs", "value": 2000}
 ], 
 "country": "Italy"}' localhost:5000/optimize
 
