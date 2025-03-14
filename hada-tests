@@ -1,10 +1,10 @@
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"bk",
-"objective": {"target":"CO2e(kg)", "type": "min"},
+{"algorithm":"anticipate",
+"objective": {"target":"time(sec)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "time(s)", "type": "leq", "value": 240},
-    {"target": "memAvg(MB)", "type": "leq", "value": 370}
+    {"target": "sol(keuro)", "type": "leq", "value": 300},
+    {"target": "CO2e(kg)", "type": "leq", "value": 0.005}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
