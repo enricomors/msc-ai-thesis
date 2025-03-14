@@ -1,5 +1,5 @@
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"anticipate",
+{"algorithm":"contingency",
 "objective": {"target":"time(sec)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
