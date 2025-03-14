@@ -56,9 +56,9 @@ AI models—those that ranked among the top 10 in terms of training compute at t
 for training has been increasing at an exponential rate, growing by a factor of 4-5x per year since 2010 \cite{epoch2024compute}. 
 
 However, this surge in compute requirements has led to a corresponding increase in energy consumption, which, in turn, has 
-amplified the environmental impact of AI due to $\mathrm{CO_2}$ emissions. For instance, the training of Meta AI's LLaMA models 
-was estimated to take approximately five months on a cluster of $2048$ $\mathrm{A}100$ $80\mathrm{GB}$ GPUs, consuming a total 
-of $2,638$ $\mathrm{MWh}$ of energy and producing approximately $1,015$ $\mathrm{tCO_2eq}$ in emissions \cite{touvron2023llama}. 
+amplified the environmental impact of AI due to $\mathsf{CO_2}$ emissions. For instance, the training of Meta AI's LLaMA models 
+was estimated to take approximately five months on a cluster of $2048$ $\mathsf{A}100$ $80\mathsf{GB}$ GPUs, consuming a total 
+of $2,638$ $\mathsf{MWh}$ of energy and producing approximately $1,015$ $\mathsf{tCO_2eq}$ in emissions \cite{touvron2023llama}. 
 Given the growing adoption of AI technologies, the rapid increase in model size and complexity, and the escalating energy demands 
 of AI applications, the carbon footprint of AI has become an increasingly pressing concern, particularly in the context of the 
 ongoing climate emergency.
@@ -93,14 +93,14 @@ The rest of the work is structured as follows:
 \section{Sustainability in AI}
 
 The environmental impact of training large AI models has been underscored by recent empirical assessments. Strubell et al. (2019)
-quantified the $\mathrm{CO_2}$ emissions of several Natural Language Processing (NLP) models and discovered that training a large
+quantified the $\mathsf{CO_2}$ emissions of several Natural Language Processing (NLP) models and discovered that training a large
 transformer with extensive hyperparameter tuning, including neural architecture search, emitted approximately 626,000 pounds 
-(around 284 metric tons) of $\mathrm{CO_2}$—comparable to the lifetime emissions of five cars \cite{strubell2019energy}. 
-Another study found out that GPT-3 released 552 metric tons of $\mathrm{CO_2}$ into the atmosphere during training, the 
+(around 284 metric tons) of $\mathsf{CO_2}$—comparable to the lifetime emissions of five cars \cite{strubell2019energy}. 
+Another study found out that GPT-3 released 552 metric tons of $\mathsf{CO_2}$ into the atmosphere during training, the 
 equivalent of 123 gasoline-powered passenger vehicles driven for one year \cite{patterson2021carbon}. These findings highlight that 
 improvements in AI accuracy often come at a significant energy and carbon cost.
 
-In response to these concerns, researchers have begun systematically reporting energy usage and the resulting $\mathrm{CO_2}$ 
+In response to these concerns, researchers have begun systematically reporting energy usage and the resulting $\mathsf{CO_2}$ 
 emissions associated with model training to raise awareness \cite{dodge2022carbon, patterson2021carbon}. Transparent reporting 
 is essential for understanding and ultimately mitigating AI's climate impacts. For instance, Henderson et al. (2020) introduced 
 a framework for tracking real-time energy consumption and carbon emissions during Machine Learning (ML) experiments, encouraging 
@@ -143,7 +143,7 @@ development.
 
 The increasing awareness of AI’s carbon footprint has motivated the development of dedicated tools and methodologies for monitoring 
 the environmental impact of AI workloads. A number of open-source tools and frameworks have been introduced to help practitioners 
-measure the energy consumption and $\mathrm{CO_2}$ emissions of their code, enabling more informed decisions about sustainability 
+measure the energy consumption and $\mathsf{CO_2}$ emissions of their code, enabling more informed decisions about sustainability 
 in AI research and deployment.
 
 One of the early tools for estimating emissions from model training was \textbf{ML CO2 Impact} (Machine Learning 
@@ -156,15 +156,15 @@ initiative, integrating its functionality into the open-source CodeCarbon packag
 
 \textbf{CodeCarbon} \cite{courty2024codecarbon}, which is the tool we employ in this work to enhance HADA, is an open-source 
 Python package designed to track the carbon footprint of computing projects. It integrates seamlessly into ML workflows, 
-logging resource usage (CPU, GPU, and other components) and estimating the $\mathrm{CO_2}$ emissions produced by the workload. 
+logging resource usage (CPU, GPU, and other components) and estimating the $\mathsf{CO_2}$ emissions produced by the workload. 
 A key feature of CodeCarbon is its ability to account for the geographic location of the computation—leveraging region-specific 
 electricity carbon intensity data to provide location-dependent emission estimates. \textbf{Carbon Intensity} refers to the 
-amount of $\mathrm{CO_2}$ emitted per unit of electricity generated, typically measured in grams of $\mathrm{CO_2}$ per 
+amount of $\mathsf{CO_2}$ emitted per unit of electricity generated, typically measured in grams of $\mathsf{CO_2}$ per 
 kilowatt-hour (gCO$_2$/kWh). This metric varies significantly across regions depending on the energy mix used for electricity 
 generation. For example, a region relying primarily on coal-fired power plants will have a much higher carbon intensity compared 
 to one powered predominantly by renewable sources such as hydropower or wind energy. By incorporating this factor, CodeCarbon 
 enables users to assess and compare the emissions impact of running their workloads in different locations. This means that 
-shifting computations to regions with lower-carbon grids can lead to substantial reductions in total $\mathrm{CO_2}$ emissions.
+shifting computations to regions with lower-carbon grids can lead to substantial reductions in total $\mathsf{CO_2}$ emissions.
 This feature allows researchers and engineers to assess the impact of their computational choices; for example, running the same 
 training job on a hydro-powered grid (e.g., in Montreal) results in significantly lower emissions than executing it on a 
 coal-reliant grid. By making these comparisons explicit, CodeCarbon aims to inform and incentivize practitioners to optimize or 
@@ -189,7 +189,7 @@ Carbon Footprint (energy consumption during training and inference) and its \tex
 hardware production and infrastructure). This study also highlights the importance of \textbf{Data Center Energy Efficiency}, 
 measured by the \textit{Power Usage Effectiveness (PUE)}, and the \textbf{Carbon Intensity of Electricity}—factors that reinforce 
 the findings of CodeCarbon. Specifically, the study emphasizes that performing AI computations in regions where energy sources 
-are cleaner (e.g., renewable-powered grids) can significantly reduce $\mathrm{CO_2}$ emissions. 
+are cleaner (e.g., renewable-powered grids) can significantly reduce $\mathsf{CO_2}$ emissions. 
 
 The development and adoption of these tracking tools play a crucial role in promoting sustainable AI research and deployment. 
 By quantifying emissions and identifying optimization strategies, these tools provide the foundation for a more environmentally 
@@ -497,7 +497,8 @@ energy-efficient graph-based optimization techniques and further refine our appr
 
 \section{Benchmarking on Different Hardware Platforms}
 
-To comprehensively evaluate the performance of the selected algorithms under varying computational environments, we conducted experiments on multiple hardware platforms. This approach allows us to better capture how changes in hardware configurations impact execution time, energy consumption, and carbon footprint.
+To comprehensively evaluate the performance of the selected algorithms under varying computational environments, we conducted experiments on multiple hardware platforms. This approach allows 
+us to better capture how changes in hardware configurations impact execution time, energy consumption, and carbon footprint.
 
 \subsection{Experimental Setup}
 
@@ -516,7 +517,9 @@ The benchmark phase was carried out on the following computing environments:
         \item 8 GB DDR3 RAM.
     \end{itemize}
     
-    \item \verb|leonardo|: A high-performance computing (HPC) infrastructure, \textbf{Leonardo}, hosted by \textbf{CINECA}. Leonardo consists of 4992 computing nodes, distributed across two primary partitions: 
+    \item \verb|leonardo|: A high-performance computing (HPC) infrastructure, \textbf{Leonardo}, hosted by \textbf{CINECA}. Leonardo consists of 4992 computing nodes, distributed across 
+    two primary partitions, i.e. the Booster Partition and the Data Centric General Purpose partition. For our benchmark, we will rely on the booster partition, which has the following 
+    specifics:
     \begin{itemize}
         \item \textbf{Booster partition} – used for this study – with:
         \begin{itemize}
@@ -529,9 +532,11 @@ The benchmark phase was carried out on the following computing environments:
 
 \subsection{Benchmarking ANTICIPATE and CONTINGENCY}
 
-For the first set of experiments, we executed \textbf{ANTICIPATE} and \textbf{CONTINGENCY} on a collection of 30 problem instances. These instances were sampled using a Gaussian statistical model, as proposed in \cite{DEFILIPPO2022109199}. 
+For the first set of experiments, we executed \textbf{ANTICIPATE} and \textbf{CONTINGENCY} on a collection of 30 problem instances. These instances were sampled using a Gaussian statistical 
+model, as proposed in \cite{DEFILIPPO2022109199}. 
 
-Each algorithm was executed on every instance with a varying configuration parameter (i.e., the number of \textit{traces} for CONTINGENCY and \textit{scenarios} for ANTICIPATE), ranging from 1 to 100. These experiments were performed on both \verb|mbp19| and \verb|leonardo|. As a result, we generated a dataset containing:
+Each algorithm was executed on every instance with a varying configuration parameter (i.e., the number of \textit{traces} for CONTINGENCY and \textit{scenarios} for ANTICIPATE), ranging 
+from 1 to 100. These experiments were performed on both \verb|mbp19| and \verb|leonardo|. As a result, we generated a dataset containing:
 
 \begin{equation}
     30 \times 100 \times 2 \times 2 = 12,000 \text{ entries}.
@@ -541,11 +546,15 @@ This dataset captures execution time, memory consumption, energy usage, and carb
 
 \subsection{Benchmarking Min-Cut/Max-Flow Algorithms}
 
-To evaluate the performance of the selected \textbf{Min-Cut/Max-Flow} algorithms, we relied on the dataset provided by Jensen et al. (2023) \cite{Jensen2023Maxflow}. This dataset contains a diverse set of Min-Cut/Max-Flow problem instances from the field of Computer Vision, allowing for a thorough assessment of algorithmic efficiency in real-world applications. Jensen et al. also provided reference implementations of the algorithms, which we used for benchmarking.
+To evaluate the performance of the selected \textbf{Min-Cut/Max-Flow} algorithms, we relied on the dataset provided by Jensen et al. (2023) \cite{Jensen2023Maxflow}. This dataset contains a 
+diverse set of Min-Cut/Max-Flow problem instances from the field of Computer Vision, allowing for a thorough assessment of algorithmic efficiency in real-world applications. Jensen et al. also
+provided reference implementations of the algorithms, which we used for benchmarking.
 
-Since these implementations were written in \textbf{C++} (for BK and EIBFS) and \textbf{C} (for HPF), integrating energy consumption tracking posed a challenge. Currently, few tools are available for directly monitoring the energy footprint of compiled C/C++ code. % TODO: Expand this discussion in the Related Work section.
+Since these implementations were written in \textbf{C++} (for BK and EIBFS) and \textbf{C} (for HPF), integrating energy consumption tracking posed a challenge. Currently, few tools are 
+available for directly monitoring the energy footprint of compiled C/C++ code. % TODO: Expand this discussion in the Related Work section.
 
-To address this issue, we developed a \textbf{Python wrapper script} that executes the C++/C implementations and integrates \textbf{CodeCarbon} for energy and emission tracking. The wrapper allows us to monitor:
+To address this issue, we developed a \textbf{Python wrapper script} that executes the C++/C implementations and integrates \textbf{CodeCarbon} for energy and emission tracking. The wrapper 
+allows us to monitor:
 \begin{itemize}
     \item Execution time and memory usage;
     \item CPU and RAM energy consumption;
@@ -557,81 +566,115 @@ To address this issue, we developed a \textbf{Python wrapper script} that execut
 While our goal was to run the selected algorithms on all instances of the Jensen et al. dataset, several factors constrained the scope of our experiments:
 
 \begin{itemize}
-    \item \textbf{Compilation and Platform Limitations:} The BK and EIBFS implementations could not be compiled on \verb|mbp19| due to missing dependencies and a lack of support for MacOS. To address this, we utilized an alternative system—\verb|PC|—running a lightweight Ubuntu distribution, enabling execution on additional hardware.
+    \item \textbf{Compilation and Platform Limitations:} The BK and EIBFS implementations could not be compiled on \verb|mbp19| due to missing dependencies and a lack of support for MacOS. 
+    To address this, we utilized an alternative system—\verb|PC|—running a lightweight Ubuntu distribution, enabling execution on additional hardware.
     
-    \item \textbf{Memory Constraints:} Some problem instances in the dataset were too large to fit within the available system memory. Although it was technically possible to use a swap partition to accommodate larger instances, this would have distorted memory usage measurements, as available monitoring tools record only RAM consumption and do not account for swapped memory.
+    \item \textbf{Memory Constraints:} Some problem instances in the dataset were too large to fit within the available system memory. Although it was technically possible to use a swap 
+    partition to accommodate larger instances, this would have distorted memory usage measurements, as available monitoring tools record only RAM consumption and do not account for swapped memory.
     
-    \item \textbf{Execution Time Considerations:} Given the extensive number of instances in the dataset, running all of them would have been prohibitively time-consuming. As a result, we selected a representative subset of problem instances that allowed us to evaluate performance across a range of complexity levels without exceeding computational constraints.
+    \item \textbf{Execution Time Considerations:} Given the extensive number of instances in the dataset, running all of them would have been prohibitively time-consuming. As a result, we 
+    selected a representative subset of problem instances that allowed us to evaluate performance across a range of complexity levels without exceeding computational constraints.
 \end{itemize}
 
-By executing experiments across multiple hardware platforms and addressing challenges related to execution and monitoring, we constructed a dataset that provides insights into algorithmic efficiency, energy consumption, and carbon emissions. The following sections will analyze the results obtained from these experiments and explore the implications of integrating sustainability metrics into algorithm selection and hardware dimensioning.
+By executing experiments across multiple hardware platforms and addressing challenges related to execution and monitoring, we constructed a dataset that provides insights into algorithmic 
+efficiency, energy consumption, and carbon emissions. The following sections will analyze the results obtained from these experiments and explore the implications of integrating sustainability
+metrics into algorithm selection and hardware dimensioning.
 
 \subsection{ANTICIPATE and CONTINGENCY}
 
-Emissions with outliers
+Following the completion of the benchmark phase, we analyze the resulting data to evaluate the carbon emissions and energy consumption of the ANTICIPATE and CONTINGENCY algorithms. This section 
+presents a comparative analysis of their environmental impact across different hardware platforms.
+
+\subsubsection{Carbon Emissions Analysis}
+
+Figure \ref{fig:ant_cont_emissions} displays the carbon emissions for ANTICIPATE and CONTINGENCY, categorized by hardware platform. The data reveals that emissions tend to be higher for the 
+ANTICIPATE algorithm, particularly when executed on the \verb|leonardo| platform. Overall, the measured values remain relatively small, except for one notable outlier exceeding 0.020 kg of 
+$\mathsf{CO_2e}$. Most emission values fall within the range $[0,0.005]$ kg. This pattern also applies to energy consumption, given that carbon emissions are directly proportional to energy 
+usage in the absence of variation in Carbon Intensity.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/emissions_ant_cont.png}
-    \caption{CO2 emissions for ANTICIPATE and CONGINGENCY ordered by platform}
+    \caption{CO$_2$ emissions for ANTICIPATE and CONTINGENCY across different platforms.}
     \label{fig:ant_cont_emissions}
 \end{figure}
+
+\subsubsection{Energy Consumption Analysis}
+
+Similarly, Figure \ref{fig:ant_cont_energy} illustrates the energy consumption for ANTICIPATE and CONTINGENCY. The overall trend aligns with the emissions data, with ANTICIPATE exhibiting higher 
+energy consumption than CONTINGENCY, particularly on \verb|leonardo|.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/energy_ant_cont.png}
-    \caption{Energy Consumption data for ANTICIPATE and CONTINGENCY}
+    \caption{Energy consumption for ANTICIPATE and CONTINGENCY across different platforms.}
     \label{fig:ant_cont_energy}
 \end{figure}
 
-% BOX PLOTS
+\subsubsection{Analysis Excluding Outliers}
 
-Emissions without outloers (IQR)
+To gain a clearer understanding of the underlying distribution of emissions, we computed the \textbf{Interquartile Range (IQR)} for the dataset, removing extreme outliers. The refined data, 
+shown in Figure \ref{fig:ant_cont_emissions_iqr}, confirms our previous observations: emissions for ANTICIPATE exhibit a wider distribution, with a slightly higher mean on \verb|leonardo|. 
+For CONTINGENCY, emissions are significantly higher on \verb|leonardo|, while on \verb|mbp19|, they remain relatively low and exhibit a narrow distribution.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/CO2_emissions_no_outliers.png}
-    \caption{CO2 emissions for ANTICIPATE and CONGINGENCY ordered by platform}
+    \caption{CO$_2$ emissions for ANTICIPATE and CONTINGENCY across platforms, after removing outliers.}
     \label{fig:ant_cont_emissions_iqr}
 \end{figure}
+
+A similar trend is observed in the energy consumption data after removing outliers, as shown in Figure \ref{fig:ant_cont_energy_iqr}. On \verb|mbp19|, the CPU is the dominant factor driving 
+energy consumption for ANTICIPATE, while for CONTINGENCY, overall energy usage remains comparatively lower.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/energy_consumption_no_outliers.png}
-    \caption{Energy Consumption data for ANTICIPATE and CONTINGENCY}
+    \caption{Energy consumption for ANTICIPATE and CONTINGENCY across platforms, after removing outliers.}
     \label{fig:ant_cont_energy_iqr}
 \end{figure}
 
-% CORRELATION MATRICES
+\subsubsection{Correlation Analysis}
+
+To further investigate the factors influencing emissions and energy consumption, Figures \ref{fig:ant_corr_mat} and \ref{fig:cont_corr_mat} present the correlation matrices for ANTICIPATE and 
+CONTINGENCY, respectively.
+
+For ANTICIPATE (Figure \ref{fig:ant_corr_mat}), the variable exhibiting the highest correlation with carbon emissions, aside from direct energy consumption, is the \textbf{average memory usage}, 
+with a correlation coefficient of $0.93$. This suggests that higher memory consumption is a key contributor to increased emissions. Additionally, CPU energy consumption and RAM energy consumption 
+both exhibit strong correlations with emissions, further reinforcing the relationship between computational resource usage and environmental impact.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/ant_corr_mat.png}
-    \caption{Correlation matrix for ANTICIPATE}
+    \caption{Correlation matrix for ANTICIPATE.}
     \label{fig:ant_corr_mat}
 \end{figure}
+
+In contrast, for CONTINGENCY (Figure \ref{fig:cont_corr_mat}), there are no particularly strong linear correlations between emissions and other performance metrics. The highest correlation with 
+emissions is observed for \textbf{execution time} ($0.36$), indicating that longer runtimes slightly contribute to higher emissions. However, the overall relationships appear weaker compared 
+to ANTICIPATE, suggesting that CONTINGENCY’s energy usage is less dependent on a single dominant factor.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/cont_corr_mat.png}
-    \caption{Correlation matrix for CONTINGENCY}
+    \caption{Correlation matrix for CONTINGENCY.}
     \label{fig:cont_corr_mat}
 \end{figure}
 
-Here we can see some results given by the HADA framework tested on the updated dataset for ANTICIPATE and CONTINGENCY. \ref{tab:anticipate_results}
-presents the results of optimising any target without any constraints for ANTICIPATE. We can notice how, for most metrics keeping the number of scenarios
-as low as possible is the best choice, while increasing them brings the solution cost down.
+From the correlation analysis, we make the following key observations:
+\begin{itemize}
+    \item Carbon emissions are perfectly proportional to total energy consumption, as indicated by the correlation of $1.0$ between \verb|totEnergy| and \verb|CO2e|. This reflects the fact 
+    that, in the absence of varying Carbon Intensity, emissions are solely determined by energy consumption.
+    \item Memory usage plays a significant role in determining emissions for ANTICIPATE, with a correlation of $0.93$. This suggests that optimizing memory allocation could be an effective s
+    trategy for reducing emissions.
+    \item For CONTINGENCY, execution time has the highest correlation with emissions ($0.36$), indicating a weaker but notable relationship.
+    \item CPU and RAM energy consumption are highly correlated with total emissions ($0.98$ and $0.99$, respectively). Since total energy consumption is simply the sum of CPU and RAM energy, 
+    this is expected.
+    \item Retaining energy consumption values in the dataset is beneficial as these values can be scaled based on different Carbon Intensity factors. This enables an analysis of the impact 
+    of computing in different geographic locations.
+\end{itemize}
 
-As we can see in \ref{fig:ant_corr_mat}, \verb|totEnergy| has a correlation of $1$ with CO2e, meaning they are perfectly proportional to each other. This reflects the fact that Carbon Emissions,
-as measured by CodeCarbon, depends by two factors, i.e. the energy consumed by running the algorithm and the Carbon Intensity. Since we executed all the experiments in the same
-country, the Carbon Intensity over the whole dataset is fixed, meaning that the only factor influencing the CO2e emissions is the energy consumed, while the Carbon Intensity
-is just a scaling factor. Indeed, \verb|totEnergy| and \verb|CO2e| both the same correlation values with the other variables. Also, as we could expect, the correlation
-of \verb|CO2e| with \verb|cpuEnergy| and \verb|ramEnergy| is also pretty high, being of $0.98$ and $0.99$ respectively, and that reflects the fact that actually the total energy consumption is
-nothing but the sum of \verb|cpuEnergy| and \verb|ramEnergy|. Then, as one may point out, we could just remove the energy consumption values from the dataset, and just keep the emissions.
-However, the energy consumption values can be scaled by different Carbon Intensity values, giving the possibility of evaluating the impact of changing the location of the computations, as we will see later on.
-Then, we can see that the average memory consumption is the variable with the highest correlation with the carbon emissions except for energy consumption, with a value of $0.93$. Then, we can see
-that for ANTICIPATE the emissions are also influenced a bit by the value of the parameter ($0.65$) and the Solution Cost ($-0.57$). We could then perform some tests on ANTICIPATE with HADA
-to asses the impact of constraints on memory and solution quality.
+\subsubsection{Testing the HADA framework with the new datasets}
 
 \begin{table}[h!]
     \centering
