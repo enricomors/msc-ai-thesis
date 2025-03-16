@@ -81,11 +81,11 @@ of reducing AI's carbon footprint.
 
 The rest of the work is structured as follows:
 \begin{itemize}
-    \item \textbf{Chapter 2} Introduces Related works that addressed the issue of AI's carbon footprint, and how Carbon Footprint is determined
-    \item \textbf{Chapter 3} Introduces some theoretical background about HADA, and explains the integration of the new metrics.
-    \item \textbf{Chapter 4} Presents the experimental setup and the results of the experiments
-    \item \textbf{Chapter 5} Presents the HADA framework, providing an overview of the tool
-    \item \textbf{Chapter 6} Presents the conclusions
+    \item \textbf{Chapter 2} Reviews the environmental impact of AI, with case studies on the carbon footprint of training large models like GPT-3. It then discusses the concept of "Green AI" vs. "Red AI"—balancing accuracy with sustainability, and covers existing tools for tracking AI energy consumption and carbon emissions, such as ML CO2 Impact and CodeCarbon.
+    \item \textbf{Chapter 3} Introduces the Empirical Model Learning (EML) approach, on which HADA is based on. Describes HADA's three-phase workflow: data collection, surrogate model training, and optimization. It then defines the methodology for tracking carbon emissions and integrates it into HADA’s hardware dimensioning process.
+    \item \textbf{Chapter 4} Presents benchmarking results for different AI algorithms, and analyzes energy consumption and CO2 emissions across different hardware platforms.
+    \item \textbf{Chapter 5} Introduces the HADA Web Application, which provides a user-friendly interface for optimizing AI workloads. Describes how users can select algorithms, define optimization constraints, and choose geographic locations to assess energy efficiency.
+    \item \textbf{Chapter 6} Summarizes key findings, emphasizing the importance of sustainability in AI computation and concludes the work.
 \end{itemize}
 
 \chapter{Related Works}
@@ -268,6 +268,8 @@ The HADA framework follows a structured three-phase approach:
     the best combination of algorithmic and hardware configurations that meet the specified constraints while minimizing the 
     objective function (e.g., energy consumption or execution time).
 \end{enumerate}
+
+%TODO: explain also robustness coefficients (?)
 
 \subsection{Extending HADA for Energy and Carbon Footprint Optimization}
 
@@ -521,14 +523,14 @@ The benchmark phase was carried out on the following computing environments:
     two primary partitions, i.e. the Booster Partition and the Data Centric General Purpose partition. For our benchmark, we will rely on the booster partition, which has the following 
     specifics:
     \begin{itemize}
-        \item \textbf{Booster partition} – used for this study – with:
-        \begin{itemize}
-            \item 512 GB (8 × 64 GB DDR4 3200 MHz) RAM per node;
-            \item Single-socket, 32-core Intel Xeon Platinum 8358 CPU, 2.60 GHz (Ice Lake) (110,592 total cores);
-            \item 4× NVIDIA custom Ampere A100 GPUs with 64 GB HBM2e memory, NVLink 3.0 (200 GB/s).
-        \end{itemize}
+        \item 512 GB (8 × 64 GB DDR4 3200 MHz) RAM per node;
+        \item Single-socket, 32-core Intel Xeon Platinum 8358 CPU, 2.60 GHz (Ice Lake) (110,592 total cores);
+        \item 4× NVIDIA custom Ampere A100 GPUs with 64 GB HBM2e memory, NVLink 3.0 (200 GB/s).
     \end{itemize}
 \end{itemize}
+
+Leonardo offers the possibility of launching jobs for execution on the booster partition using the slurm job scheduler, by specified the required runtime and resources. For the benchmark 
+runs with anticipate and contingency, we requested 16 cores, while the min-cut/max-flow algorithm runs were executed on 32 cores.
 
 \subsection{Benchmarking ANTICIPATE and CONTINGENCY}
 
@@ -589,8 +591,7 @@ presents a comparative analysis of their environmental impact across different h
 
 Figure \ref{fig:ant_cont_emissions} displays the carbon emissions for ANTICIPATE and CONTINGENCY, categorized by hardware platform. The data reveals that emissions tend to be higher for the 
 ANTICIPATE algorithm, particularly when executed on the \verb|leonardo| platform. Overall, the measured values remain relatively small, except for one notable outlier exceeding 0.020 kg of 
-$\mathsf{CO_2e}$. Most emission values fall within the range $[0,0.005]$ kg. This pattern also applies to energy consumption, given that carbon emissions are directly proportional to energy 
-usage in the absence of variation in Carbon Intensity.
+$\mathsf{CO_2e}$. Most emission values fall within the range $[0,0.005]$ kg.
 
 \begin{figure}[h!]
     \centering
@@ -602,36 +603,13 @@ usage in the absence of variation in Carbon Intensity.
 \subsubsection{Energy Consumption Analysis}
 
 Similarly, Figure \ref{fig:ant_cont_energy} illustrates the energy consumption for ANTICIPATE and CONTINGENCY. The overall trend aligns with the emissions data, with ANTICIPATE exhibiting higher 
-energy consumption than CONTINGENCY, particularly on \verb|leonardo|.
+energy consumption than CONTINGENCY, particularly on \verb|leonardo|, given that carbon emissions are directly proportional to energy usage in the absence of variation in Carbon Intensity.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.8\textwidth]{imgs/energy_ant_cont.png}
     \caption{Energy consumption for ANTICIPATE and CONTINGENCY across different platforms.}
     \label{fig:ant_cont_energy}
-\end{figure}
-
-\subsubsection{Analysis Excluding Outliers}
-
-To gain a clearer understanding of the underlying distribution of emissions, we computed the \textbf{Interquartile Range (IQR)} for the dataset, removing extreme outliers. The refined data, 
-shown in Figure \ref{fig:ant_cont_emissions_iqr}, confirms our previous observations: emissions for ANTICIPATE exhibit a wider distribution, with a slightly higher mean on \verb|leonardo|. 
-For CONTINGENCY, emissions are significantly higher on \verb|leonardo|, while on \verb|mbp19|, they remain relatively low and exhibit a narrow distribution.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{imgs/CO2_emissions_no_outliers.png}
-    \caption{CO$_2$ emissions for ANTICIPATE and CONTINGENCY across platforms, after removing outliers.}
-    \label{fig:ant_cont_emissions_iqr}
-\end{figure}
-
-A similar trend is observed in the energy consumption data after removing outliers, as shown in Figure \ref{fig:ant_cont_energy_iqr}. On \verb|mbp19|, the CPU is the dominant factor driving 
-energy consumption for ANTICIPATE, while for CONTINGENCY, overall energy usage remains comparatively lower.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{imgs/energy_consumption_no_outliers.png}
-    \caption{Energy consumption for ANTICIPATE and CONTINGENCY across platforms, after removing outliers.}
-    \label{fig:ant_cont_energy_iqr}
 \end{figure}
 
 \subsubsection{Correlation Analysis}
@@ -711,10 +689,9 @@ for tighter solution cost bounds, the numbber of scenarios tends to increase (re
 number of scenarios means more memory usage, the carbon emissions also grows. When the solution cost is allowed to be higher, the number of scenarios is instead kept as low as possible, given
 that we are trying to minimize the CO$_2$ emissions. Thus, in the case of ANTICIPATE we have a trade-off between CO$_2$ emissions and Solution cost.
 
-A notable outcome is that HADA always selected the mbp19 platform, even when higher values of $n^P$ were required. This suggests that Leonardo's computational power does not necessarily 
-provide an advantage when minimizing emissions, and mbp19 was more energy efficent during the benchmark phase.
-
-% TODO: restart from here, integrate the analysis of the two datasets to support the experiments results
+A notable outcome is that, when trying to minimize the emissions HADA always selected the mbp19 platform. This suggests that the additional computational power offered by leonardo comes with an
+higher energy cost, as shown by \ref{fig:ant_cont_emissions} and \ref{fig:ant_cont_energy}, so that, when the focus is on minimizing the CO$_2$ emissions mbp19 seems to be the "greener" choice.
+The advanges of using leonardo may come instead from the reduced runtimes.
 
 \begin{figure}[h!]
     \centering
@@ -723,12 +700,26 @@ provide an advantage when minimizing emissions, and mbp19 was more energy effice
     \label{fig:time_comparison}
 \end{figure}
 
-\ref{fig:time_comparison} shows results relative to the runtime of the two algorithms on both platforms. We can notice that for ANTICIPATE executes computations faster.
-Nonetheless, its energy consumption per unit of work is significantly higher, resulting in greater CO$_2$ emissions overall. In contrast, mbp19, despite longer runtimes, consumed much less energy and emitted substantially less CO$_2$. This trade-off highlights 
-that faster computation does not always equate to lower environmental impact. We can try to verify this by perfoming some tests with the runtime minization as objective, by trying to minimize
-solution cost and emissions of CO2e.
+\ref{fig:time_comparison} shows that, for ANTICIPATE, the execution time time on leonardo is smaller on average, which is confirmed by \ref{tab:anticipate_runtime_comparison}
 
-\begin{table}[h!]
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llccccccc}
+        \toprule
+        \textbf{Algorithm} & \textbf{Platform} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+        \midrule
+        \textbf{ANTICIPATE} & leonardo & 52.876531 & 31.205927 & 1.22 & 115.18 \\
+                            & mbp19    & 93.023027 & 57.730152 & 1.50 & 284.29 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of runtime statistics for the ANTICIPATE algorithm on different platforms.}
+    \label{tab:anticipate_runtime_comparison}
+\end{table}
+
+We can try to test the potential benefits of leonardo by using the runtime as objective to minimize in HADA. \ref{tab:anticipate_results_runtime} presents the results of a set of experiments 
+with the objective of runtime minimization of ANTICIPATE, with constrinats on the solution cost and the CO$_2$ emissions.
+
+\begin{table}[h!] 
     \centering
     \begin{tabular}{|cc|ccccc|}
         \hline
@@ -747,13 +738,28 @@ solution cost and emissions of CO2e.
     \label{tab:anticipate_results_runtime}
 \end{table}
 
-From the experiments presented in \ref{tab:anticipate_results_runtime} we can see that when we try to minimize the runtime, and we have tight bounds on the solution cost, the preferrable choice 
-is leonardo, with an high number of scenarios. When we tighten the bounds on carbon emissions and loosen the constraints on the solution cost the number of scenarios is brought down to 1. When
-constraints on the carbon emissions are very low ($ 1 \times 10 ^ {-5}$ or less), HADA starts preferring mbp19 to leonardo, due to the greater energy efficiency for smaller values of the parameter,
-at the expense of an higher solution cost.
+From these experiments we can see that when we try to minimize the runtime, and we have tight bounds on the solution cost, the preferrable choice is leonardo, with an high number of scenarios. 
+So this confirms that leonardo can actually provide advantages when the emphasis is on runtime minimization and constraints on the solution cost, since to obtain cheaper solutions a higher number
+of scenarios is required, and this cause an increase in the runtime. For example, we can compare the runtimes of ANTICIPATE with 96 scenarios on both platforms, and we can see that on mbp19 they
+are considerably higher (See \ref{tab:96_scenarios_runtime}):
 
-Furthermore, in cases where stricter memory and solution cost constraints were applied, HADA was unable to find feasible solutions. This suggests that certain configurations may inherently 
-require high memory usage and cannot be optimized solely based on emissions minimization.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{cccccccc}
+        \hline
+        \textbf{Platform} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{Max} \\
+        \hline
+        leonardo & 101.663448 & 2.280052 & 96.47 & 106.40 \\
+        mbp19    & 184.732667 & 23.545764 & 167.55 & 256.84 \\
+        \hline
+    \end{tabular}
+    \caption{Runtime statistics for 96 scenarios using the ANTICIPATE algorithm.}
+    \label{tab:96_scenarios_runtime}
+\end{table}
+
+However, for the same configuration of the algorithm on mbp19, the emission values are an order of magnitude lower. Indeed, when constraints on the carbon emissions are very 
+low ($ 1 \times 10 ^ {-5}$ or less), HADA starts preferring mbp19 to leonardo, due to the greater energy efficiency for smaller values of the parameter,
+at the expense of an higher solution cost.
 
 For CONTINGENCY, Table \ref{tab:contingency_results} presents the results of optimizing CO$_2$ emissions under constraints on execution time and solution cost. Given that execution time 
 showed the highest correlation with emissions ($0.47$), we focused on determining whether limiting runtime would impact emissions optimization.
@@ -781,30 +787,8 @@ showed the highest correlation with emissions ($0.47$), we focused on determinin
 The results for CONTINGENCY further reinforce the platform selection pattern seen in ANTICIPATE: HADA consistently favored mbp19 over Leonardo. This was expected, as we can see In
 \ref{fig:time_comparison}, that CONTINGENCY runs significantly slower on Leonardo than on mbp19. By looking at the dataset, we can see that Leonardo incurred a large overhead ($\approx60$s) 
 even for a single trace, whereas mbp19 handled one trace in $5$-$6$s. This trend continued as traces increased, as with 100 traces, mbp19 has runtimes around 140 seconds, while leonardo runtime
-values are around 800 seconds. 
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|cc|ccccc|}
-        \hline
-        \multicolumn{2}{|c|}{Bounds} & \multicolumn{5}{c|}{Solution} \\
-        \hline
-        CO2eq (kg) & Cost (k€) & $n^P$ & HW & CO$_2$ (kg) & Time (s) & Cost (k€) \\
-        \hline
-        0.005 & 300 & 1 & none & none & none & none \\
-        0.005 & 400 & 1 & mbp19 & $3.35 \times 10^{-6}$ & $5.16$ & $369.68$ \\
-        0.01 & 280 & 87 & leonardo & $4.24 \times 10^{-3}$ & $92.04$ & $274.01$ \\
-        0.1 & 270 & 96 & leonardo & $4.74 \times 10^{-3}$ & $100.94$ & $267.40$ \\
-        0.0001 & 400 & 1 & leonardo & $7.53 \times 10^{-5}$ & $1.24$ & $368.73$ \\
-        0.00001 & 400 & 1 & mbp19 & $7.23 \times 10^{-6}$ & $1.53$ & $368.73$ \\
-        \hline
-    \end{tabular}
-    \caption{Experimental results for the CONTINGENCY algorithm, minimizing runtime with constraints on solution cost and CO2 emissions}
-    \label{tab:contingency_results_runtime}
-\end{table}
-
-Even by looking at the memory consumption we can see that mbp19 outperforms
-leonardo(\ref{fig:mem_usage_comparison}), with actually no visible gains in terms of solution cost, as we can see by \ref{fig:cost_comparison}. 
+values are around 800 seconds. Thus, contrary to what happened with ANTICIPATE, with CONTINGENCY using leonardo did not brought any significant advantage in performance. Even by looking at the
+memory consumption we can see that mbp19 outperforms leonardo(\ref{fig:mem_usage_comparison}), with actually no visible gains in terms of solution cost, as we can see by \ref{fig:cost_comparison}. 
 
 \begin{figure}[h!]
     \centering
@@ -822,14 +806,14 @@ leonardo(\ref{fig:mem_usage_comparison}), with actually no visible gains in term
     \label{fig:comparison}
 \end{figure}
 
-From the results obtained in both ANTICIPATE and CONTINGENCY experiments, it is evident that platform selection plays a critical role in emissions optimization. While Leonardo provides 
-superior raw computational speed, its higher energy consumption leads to a greater carbon footprint, making it an unfavorable choice for emissions minimization in the tested workloads.
-
 \subsection{Min-Cut/Max-Flow Algorithms}
 
-Now, we presents some analysis of data for the Min-Cut/Max-flow algorithms, and some results of tests performed with HADA. First, we take a look at the emissions for the three algorithms.
-We can notice from \ref{fig:max_flow_emissions} that the vast majority of configurations tested emitted less than 0.001 kg of CO$_2$, by looking at the IQR for the emission data (\ref{fig:max_flow_emissions_iqr})
-we can see how most configurations emissions are below $8 \times 10^{-6}$ kg of CO$_2$.
+In this section, we analyze the performance and environmental impact of Min-Cut/Max-Flow algorithms and discuss the results obtained from tests performed using the HADA framework. 
+These algorithms play a crucial role in various optimization problems, particularly in computer vision and network flow applications. Figure \ref{fig:max_flow_emissions} presents an 
+overview of the CO$_2$ emissions for the three Min-Cut/Max-Flow algorithms tested. It is evident that the vast majority of configurations emitted less than 0.001 kg of CO$_2$, 
+similar to trends observed for the ANTICIPATE and CONTINGENCY algorithms.
+
+\subsubsection{Carbon Emissions Analysis}
 
 \begin{figure}[h!]
     \centering
@@ -838,16 +822,81 @@ we can see how most configurations emissions are below $8 \times 10^{-6}$ kg of 
     \label{fig:max_flow_emissions}
 \end{figure}
 
+By examining emissions data in Table \ref{tab:co2_benchmark}, we confirm that smaller architectures, such as \verb|pc| and \verb|mbp19|, tend to be more energy-efficient than the 
+high-performance computing (HPC) system Leonardo. However, it is important to note that not all problem instances were executed on every platform due to constraints on memory 
+availability and computational feasibility. 
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llccc}
+        \hline
+        \textbf{Algorithm} & \textbf{Platform} & \textbf{Mean} & \textbf{Min} & \textbf{Max} \\
+        \hline
+        \textbf{BK} & leonardo & $5.155456 \times 10^{-5}$ & $2.883260 \times 10^{-6}$ & 0.006184 \\
+                    & pc       & $8.010042 \times 10^{-7}$ & $8.684843 \times 10^{-9}$ & 0.000145 \\
+        \hline
+        \textbf{EIBFS} & leonardo & $2.364746 \times 10^{-5}$ & $2.897591 \times 10^{-6}$ & 0.001861 \\
+                       & pc       & $5.059142 \times 10^{-7}$ & $9.001983 \times 10^{-9}$ & 0.000027 \\
+        \hline
+        \textbf{HPF} & leonardo & $2.283886 \times 10^{-4}$ & $2.960032 \times 10^{-5}$ & 0.007584 \\
+                     & mbp19    & $1.232039 \times 10^{-5}$ & $4.693739 \times 10^{-7}$ & 0.001145 \\
+        \bottomrule
+    \end{tabular}
+    \caption{CO2e(kg) statistics for different algorithms and platforms.}
+    \label{tab:co2_benchmark}
+\end{table}
+
+The discrepancy in emissions can largely be attributed to the scale of the problem instances executed on each platform. Due to the significantly larger memory available on Leonardo, 
+the most demanding instances (with node counts reaching hundreds of millions) were exclusively executed on this HPC system. 
+
+Additionally, some problem instances could not be solved by HPF implementations due to their reliance on negative capacity arcs. While BK and EIBFS supported such instances, HPF's 
+current implementation does not, resulting in the exclusion of these cases from the dataset.
+
+\subsubsection{Correlation Analysis}
+
+To further understand the factors influencing emissions, Figures \ref{fig:bk_orr_mat}, \ref{fig:eibfs_corr_mat}, and \ref{fig:hpf_flow_corr_mat} present the correlation matrices for BK, 
+EIBFS, and HPF, respectively. 
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/max_flow_emissions_iqr.png}
-    \caption{IQR for the CO2 emissions of Min-Cut/Max-Flow algorithms}
-    \label{fig:max_flow_emissions_iqr}
+    \includegraphics[width=0.8\textwidth]{imgs/bk_corr_mat.png}
+    \caption{Correlation matrix for BK}
+    \label{fig:bk_orr_mat}
 \end{figure}
 
-We now present the results of some tests performed on these algorithms with HADA. As already mentioned, the attribute we use as a parameter for these algorithms is the type of implementation used.
-As for ANTICIPATE and CONTINGENCY we test HADA using the minimization of CO$_2$ as objective. In this case we also look at the size of the problem (Nodes, Arcs) to see how this could influence 
-the results in terms of emissions and other performance metrics.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/eibfs_corr_mat.png}
+    \caption{Correlation matrix for EIBFS}
+    \label{fig:eibfs_corr_mat}
+\end{figure}
+
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imgs/hpf_corr_mat.png}
+    \caption{Correlation matrix for BK}
+    \label{fig:hpf_flow_corr_mat}
+\end{figure}
+
+For both BK and EIBFS, runtime exhibits the strongest correlation with CO$_2$ emissions. In \ref{fig:bk_orr_mat}, we observe that execution time has a correlation of approximately
+$0.99$ with energy consumption and emissions, indicating that the longer an algorithm runs, the more energy it consumes, which directly translates into higher emissions. This trend 
+is similarly observed in EIBFS (\ref{fig:eibfs_corr_mat}), reinforcing that for these algorithms, minimizing runtime is the most effective way to reduce emissions. Given this insight, 
+we will assess how BK and EIBFS behave when constraints on runtime are introduced, particularly when minimizing CO$_2$ emissions.
+
+HPF, on the other hand, demonstrates a slightly different behavior. From Figure \ref{fig:hpf_flow_corr_mat}, we can see that the strongest correlation with CO$_2$ emissions is memory usage, 
+specifically peak memory usage (memPeak) and average memory usage (memAvg), both exceeding 0.93. This suggests that rather than runtime alone, memory allocation plays a significant 
+role in determining the carbon footprint of HPF. For this reason, in the experiments on HPF we impose constraints on peak memory usage rather than runtime.
+
+\subsubsection{Performance Evaluation of Min-Cut/Max-Flow Algorithms with HADA}
+
+In this section, we present the experimental results of optimizing the execution of Min-Cut/Max-Flow algorithms using HADA. The key objective was to evaluate the impact of different
+hardware platforms (PC, mbp19, and Leonardo) on execution time, CO$_2$ emissions, and memory usage.
+
+\paragraph{Optimization for CO$_2$ Emissions Minimization}
+
+Tables \ref{tab:bk_results}, \ref{tab:eibfs_results}, and \ref{tab:hpf_results} summarize the results obtained when minimizing CO$_2$ emissions. Across all three algorithms, we observe
+a strong preference for smaller-scale hardware platforms, with PC and mbp19 being consistently selected over Leonardo.
 
 \begin{table}[h!]
     \centering
@@ -857,7 +906,7 @@ the results in terms of emissions and other performance metrics.
         \hline
         Nodes & Arcs & time(s) & Impl. & HW & CO2e & time(s) \\
         \hline
-        40 & 400 & $0.1$ & MBK & pc & $4.38 \times 10^{-7}$ & $3.80 \times 10^{-5}$ \\
+        40 & 400 & $0.1$ & MBK2 & pc & $4.38 \times 10^{-7}$ & $3.81 \times 10^{-5}$ \\
         120 & 2k & $0.1$ & MBK2 & pc & $4.40 \times 10^{-7}$ & $5.10 \times 10^{-5}$ \\
         1k & 5k & $0.1$ & MBK & pc & $4.40 \times 10^{-7}$ & $4.09 \times 10^{-4}$ \\
         10k & 62k & $0.1$ & BK & pc & $4.40 \times 10^{-7}$ & $2.63 \times 10^{-3}$ \\
@@ -916,62 +965,236 @@ the results in terms of emissions and other performance metrics.
     \label{tab:hpf_results}
 \end{table}
 
-In \ref{tab:bk_results} \ref{tab:eibfs_results} and \ref{tab:hpf_results} we can see how also for the min-cut/max-flow algorithms, when minimizing the Carbon Emissions, the small scale Hardware 
-platforms are preferred, since HADA always selects pc and mbp19. 
+Similar trends were observed for EIBFS and HPF, as shown in Tables \ref{tab:eibfs_results} and \ref{tab:hpf_results}. When CO$_2$ emissions were minimized, the computationally
+lighter hardware architectures were consistently preferred. This result can be attributed to the following factors:
 
-\begin{figure}[h!]
+\begin{itemize}
+    \item Smaller architectures tend to have lower power consumption per computation unit, making them more efficient in terms of emissions when processing relatively small to mid-sized problem instances.
+    \item High-performance computing (HPC) systems like Leonardo introduce computational overhead, which increases overall energy consumption, especially when handling smaller problem instances.
+    \item The serial nature of the tested algorithm implementations does not exploit the parallelism of the HPC architecture, leading to underutilization of available resources.
+\end{itemize}
+
+\paragraph{Optimization for Runtime Minimization}
+
+To explore whether HPC would provide a significant advantage in execution time, we re-ran HADA optimization while minimizing runtime instead of emissions. The results for BK, EIBFS, 
+and HPF are presented in Tables \ref{tab:bk_results_time}, \ref{tab:eibfs_results_runtime}, and \ref{tab:hpf_results_runtime}.
+
+\begin{table}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/max_flow_corr_mat.png}
-    \caption{Correlation matrix for Min-Cut/Max-Flow Algorithms BK, EIBFS and HPF}
-    \label{fig:max_flow_corr_mat}
-\end{figure}
+    \begin{tabular}{|ccc|cccc|}
+        \hline
+        \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
+        \hline
+        Nodes & Arcs & CO2e(kg) & Impl. & HW & CO2e & time(s) \\
+        \hline
+        40 & 400 & $0.1$ & MBK2 & pc & $4.38 \times 10^{-7}$ & $3.81 \times 10^{-5}$ \\
+        120 & 2k & $0.1$ & MBK2 & pc & $4.40 \times 10^{-7}$ & $5.10 \times 10^{-5}$ \\
+        1k & 5k & $0.1$ & MBK & leonardo & $4.40 \times 10^{-7}$ & $1.10 \times 10^{-4}$ \\
+        10k & 62k & $0.1$ & MBK & leonardo & $4.40 \times 10^{-7}$ & $2.32 \times 10^{-3}$ \\
+        16k & 111k & $0.1$ & MBK & leonardo & $4.44 \times 10^{-5}$ & $1.37$ \\
+        44k & 784k & $0.1$ & MBK2 & leonardo & $2.63 \times 10^{-6}$ & $0.88$ \\
+        185k & 5M & $5$ & MBK2 & pc & $2.16 \times 10^{-6}$ & $0.28$ \\
+        18M & 93M & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$& $9.79$ \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the BK algorithm}
+    \label{tab:bk_results_time}
+\end{table}
 
-\begin{figure}[h!]
+For smaller problem instances, we see that PC and mbp19 remain preferable (see \ref{tab:bk_results_time}). However, in some cases involving larger problem sizes (e.g., 16k nodes, 111k arcs), HADA selects Leonardo. 
+Despite this, the improvement in runtime is not substantial, with the execution time on PC being approximately $4.09 \times 10^{-4}$ seconds compared to $1.10 \times 10^{-4}$ 
+seconds on Leonardo.
+
+\begin{table}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/bk_corr_mat.png}
-    \caption{Correlation matrix for BK}
-    \label{fig:bk_orr_mat}
-\end{figure}
+    \begin{tabular}{|ccc|cccc|}
+        \hline
+        \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
+        \hline
+        Nodes & Arcs & time(s) & Impl. & HW & CO2e & time(s) \\
+        \hline
+        40 & 400 & $0.1$ & EIBFS new2 & leonardo & $3.01 \times 10^{-6}$ & $1.37 \times 10^{-5}$ \\
+        120 & 2k & $0.1$ & EIBFS new2 & leonardo & $3.01 \times 10^{-6}$ & $7.22 \times 10^{-5}$ \\
+        1k & 5k & $0.1$ & EIBFS new2 & leonardo & $4.40 \times 10^{-6}$ & $7.23 \times 10^{-4}$ \\
+        10k & 62k & $0.1$ & EIBFS new2 & leonardo & $4.40 \times 10^{-6}$ & $1.72 \times 10^{-3}$ \\
+        44k & 784k & $0.1$ & EIBFS new2 & leonardo & $9.27 \times 10^{-6}$ & $0.02$ \\
+        185k & 5M & $0.1$ & EIBFS new2 & leonardo & $8.80 \times 10^{-6}$ & $0.09$ \\
+        18M & 93M & $5$ & EIBFS new & pc & $1.98 \times 10^{-5}$& $3.51$ \\
+        143M & 1B & $10$ & none & none & none & none \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the EIBFS algorithm}
+    \label{tab:eibfs_results_runtime}
+\end{table}
 
-\begin{figure}[h!]
+For EIBFS (see \ref{tab:eibfs_results_runtime}), results still confirm this trend even if in these case we have more configurations with leonardo.
+
+\begin{table}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/eibfs_corr_mat.png}
-    \caption{Correlation matrix for EIBFS}
-    \label{fig:eibfs_corr_mat}
-\end{figure}
+    \begin{tabular}{|ccc|cccc|}
+        \hline
+        \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
+        \hline
+        Nodes & Arcs & CO2e(kg) & Impl. & HW & CO2e & time(s) \\
+        \hline
+        2.5k & 50k & $0.1$ & HPF-H-F & leonardo & $3.58 \times 10^{-6}$ & 0.001 \\
+        10k & 75k & $0.1$ & HPF-H-L & leonardo & $2.98 \times 10^{-6}$ & 0.002 \\
+        16k & 111k & $0.1$ & HPF-H-F & leonardo & $1.02 \times 10^{-3}$ & 11.648 \\
+        15k & 200k & $0.1$ & HPF-H-F & leonardo & $1.55 \times 10^{-3}$ & 2.214 \\
+        134k & 921k & $0.1$ & HPF-L-F & leonardo & $1.46 \times 10^{-6}$ & 9.278 \\
+        1M & 5M & $0.1$ & HPF-L-L & mpb19 & $8.25 \times 10^{-6}$ & 0.062 \\
+        10M & 25M & $3000$ & HPF-H-L & mbp19 & $6.85 \times 10^{-5}$ & 5.31 \\
+        125M & 300M & $4000$ & HPF-L-F & mbp19 & $9.08 \times 10^{-3}$ & 27.74 \\
+        \hline
+    \end{tabular}
+    \caption{Experimental results for the EIBFS algorithm}
+    \label{tab:hpf_results_runtime}
+\end{table}
 
+For HPF, similar results hold, with mbp19 being preferred for smaller instances, while Leonardo is selected for medium-sized problems.
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{imgs/hpf_corr_mat.png}
-    \caption{Correlation matrix for BK}
-    \label{fig:hpf_flow_corr_mat}
-\end{figure}
+\paragraph{Discussion: Why Does HPC Not Show a Significant Runtime Advantage?}
+
+From the results obtained, we observe that even when optimizing for runtime, HADA often does not favor HPC. Several factors contribute to this:
+
+\begin{itemize}
+    \item Sequential Algorithm Implementations: the versions of BK, EIBFS, and HPF tested in this study were single-threaded, meaning they do not take advantage of parallel 
+    processing capabilities offered by HPC clusters. As highlighted by Jensen et al. \cite{Jensen2023Maxflow}, specialized parallel implementations of max-flow algorithms exist, 
+    and these would likely benefit more from HPC architectures.
+    \item Computational Overhead in HPC systems: HPC environments like Leonardo introduce additional computational overhead due to factors such as job scheduling, data transfer, 
+    and process management. For small and medium-sized instances, this overhead can negate the potential runtime benefits, leading to comparable or even worse performance compared 
+    to commodity hardware.
+\end{itemize}
 
 \chapter{HADA-as-a-Service}
 
 \section{HADA Web Application}
-Benchmark data was integrated into the HADA web application, requiring:
+
+The HADA framework, which was used to conduct the experiments in this study, has also been implemented as a web application. This implementation provides a user-friendly interface 
+for defining optimization problems, specifying constraints, and selecting the appropriate computational setup. The interface of the HADA web service application is depicted in 
+\ref{fig:hada_ui}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/HADA-main-ui.png}
+    \caption{The UI for the HADA web service application}
+    \label{fig:hada_ui}
+\end{figure}
+
+The web interface is designed to simplify the optimization process by offering several key functionalities:
 \begin{itemize}
-\item Creation of JSON configuration files for each algorithm-hardware combination.
-\item Specification of hyperparameters and performance targets.
+    \item Algorithm Selection: A dropdown menu allows the user to select the target algorithm for optimization.
+    \item Input File Uploader: For input-dependent algorithms, users can upload input datasets required for execution.
+    \item Geographic Selection: The user can select the country where the computation will be performed. This is crucial as it affects the carbon emissions estimation based on region-specific Carbon Intensity values.
+    \item Optimization Target: The user can specify which metric to optimize, such as execution time, energy consumption, or carbon emissions.
+    \item Robustness Factor: An optional setting that allows to specify confidence level for the user defined constraints
+    \item Constraint Specification: Users can define constraints on various performance metrics (e.g., execution time, memory usage, CO$_2$ emissions). Constraints can be defined as:
+    \begin{itemize}
+        \item $\leq$ (Upper bound) 
+        \item $\geq$ (Lower bound)
+        \item $=$ (Fixed value)
+    \end{itemize} 
+    \item The "Optimise" button, which launches the optimization process.
 \end{itemize}
 
-Example JSON structure:
+When the optimization starts, the HADA backend performs the following steps:
+\begin{itemize}
+    \item Model Checking: The system verifies if pre-trained models exist for the required combination of (Algorithm, Hardware, Target). If a model is unavailable, HADA trains a new one.
+    \item Machine Learning Models: The ML models used are Decision Tree Regressors with a maximum depth of 10. These models were found to provide a good balance between prediction accuracy and computational complexity \cite{DEFILIPPO2022109199}.
+    \item Integration with Optimization Engine: The trained ML models are incorporated into the optimization problem as constraints.
+    \item Solving the Optimization Model: The mathematical model, including user-defined constraints, is passed to IBM CPLEX, which attempts to find an optimal solution.
+\end{itemize}
+
+An example of an optimization request sent through the HADA GUI is depicted in \ref{fig:hada_optimisation_req}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/HADA-optimisation-req.png}
+    \caption{Example of an optimisation request sent to HADA via the GUI}
+    \label{fig:hada_optimisation_req}
+\end{figure}
+
+If a feasible solution is found, the HADA GUI displays the optimal configuration, including the selected hardware platform, algorithm hyperparameters, and the estimated performance metrics, as shown in Figure~\ref{fig:hada_solution}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/hada-solution-italy.png}
+    \caption{The solution provided for the above example in Figure~\ref{fig:hada_optimisation_req}}
+    \label{fig:hada_solution}
+\end{figure}
+
+One of the key aspects of this work was to extend HADA account for geographical variations in Carbon Intensity when computing emissions. To demonstrate this, we perform the same 
+optimization request but change the execution location. For example, Figure~\ref{fig:hada_solution_turkmenistan} shows the results when selecting Turkmenistan as the execution country. 
+According to Our World in Data \cite{ember2024carbonintensity}, Turkmenistan had the highest Carbon Intensity in 2023, with 1.168 kg of CO$_2$ per kWh.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{imgs/hada-solution-turkmenistan.png}
+    \caption{Solution provided for the same constraint as in \ref{fig:hada_optimisation_req}, but this time selecting "Turkmenistan" as "Country"}
+    \label{fig:hada_solution_turkmenistan}
+\end{figure}
+
+Comparing this to Figure~\ref{fig:hada_solution}, where Italy was the selected country, we observe a significant increase in CO₂ emissions:
+
+\begin{itemize}
+    \item Italy: $\approx 1.77 \times 10^{-4}$ kg CO$_2$e
+    \item Turkmenistan: $\approx 6.98 \times 10^{-4}$ kg CO$_2$e
+\end{itemize}
+
+This increase highlights the critical role of geographic selection when running large-scale computations. While the absolute difference in emissions for a single execution might seem 
+small, the impact becomes substantial when considering large workloads and multiple executions. This reinforces the importance of choosing greener energy grids whenever possible.
+
+\subsection{Integration of Benchmark Data into HADA}
+
+To expand HADA with additional benchmark data, datasets must be structured and formatted correctly. The standard organization for datasets is shown in Figure~\ref{fig:datasets_organization}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{imgs/benchmark-datasets.png}
+    \caption{Organization of benchmark datasets for integration into HADA.}
+    \label{fig:datasets_organization}
+\end{figure}
+
+\subsubsection{Dataset Format}
+
+HADA expects datasets in \texttt{.csv} format, with files organized by \textbf{algorithm} and \textbf{platform}. Each dataset contains:
+\begin{itemize}
+    \item Algorithm Name
+    \item Hardware Platform
+    \item Hyperparameters (e.g., number of scenarios for ANTICIPATE)
+    \item Target Performance Metrics (e.g., execution time, energy consumption, CO$_2$ emissions)
+    \item Optional Input Parameters for input-dependent algorithms
+\end{itemize}
+
+\subsubsection{Metadata JSON Configuration}
+
+In addition to dataset files, HADA requires a \textbf{JSON configuration file} specifying:
+\begin{itemize}
+    \item Algorithm details
+    \item Hardware platform information
+    \item Hyperparameter definitions
+    \item Target performance metrics
+    \item Constraints (if any)
+\end{itemize}
+
+Below is an example JSON structure:
+
 \begin{verbatim}
 {
-"name": "anticipate",
-"HW_ID": "macbook",
-"hyperparams": [
-{"ID": "num_scenarios", "type": "int", "LB": 1, "UB": 100}
-],
-"targets": [
-{"ID": "time", "LB": null, "UB": null},
-{"ID": "memory", "LB": null, "UB": null},
-{"ID": "emissions", "LB": null, "UB": null}
-]
+    "name": "anticipate",
+    "HW_ID": "macbook",
+    "hyperparams": [
+        {"ID": "num_scenarios", "type": "int", "LB": 1, "UB": 100}
+    ],
+    "targets": [
+        {"ID": "time", "LB": null, "UB": null},
+        {"ID": "memory", "LB": null, "UB": null},
+        {"ID": "emissions", "LB": null, "UB": null}
+    ]
 }
 \end{verbatim}
+
+This approach allows HADA to seamlessly integrate new datasets, expanding its optimization capabilities to additional algorithms and hardware platforms.
 
 \chapter{Conclusions}
 
@@ -979,6 +1202,11 @@ This work extends HADA by integrating carbon emission constraints, enhancing its
 for sustainable AI hardware selection. Through experimental benchmarks on laptops and HPC systems, 
 we validated the framework’s ability to balance performance and environmental impact. The web-based prototype 
 enables users to make informed decisions when configuring AI workloads under sustainability constraints.
+
+From the results obtained in both ANTICIPATE and CONTINGENCY experiments, it is evident that platform selection plays a critical role in emissions optimization. Higher performance platforms like
+leonardo could be beneficial when the superior computational power brings significant improvements in the algorithm runtime. Usage of HPC architectures like leonardo could be convenient to 
+perform heavy parallel compuations, expecially with runtime constraints, or when the problem size requires more memory. For light or moderate workloads, with little to no parallelization, expecially
+when energy efficiency is the main focus, one should stick with smaller architectures.
 
 \appendix
 

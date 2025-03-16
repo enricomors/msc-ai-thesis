@@ -18,20 +18,66 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "country": "Italy"}' localhost:5000/optimize
 
 curl -X POST -H 'Content-Type: application/json' -d ' 
-{"algorithm":"bk",
-"objective": {"target":"CO2e(kg)", "type": "min"},
+{"algorithm":"eibfs",
+"objective": {"target":"time(s)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "memAvg(MB)", "type": "leq", "value": 10}
+    {"target": "CO2e(kg)", "type": "leq", "value": 0.1}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
 ],
 "inputs": [
-    {"name":"load_std", "value": 167},
-    {"name":"load_mean", "value": 314},
-    {"name":"pv_std", "value": 276},
-    {"name":"pv_mean", "value": 268}
+    {"name":"nodes", "value": 143000000},
+    {"name":"arcs", "value": 1000000000}
+], 
+"country": "Italy"}' localhost:5000/optimize
+
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"bk",
+"objective": {"target":"time(s)", "type": "min"},
+"robustness_fact": null,
+"constraints": [
+    {"target": "CO2e(kg)", "type": "leq", "value": 0.1}
+],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"nodes", "value": 16000000},
+    {"name":"arcs", "value": 111000000}
+], 
+"country": "Italy"}' localhost:5000/optimize
+
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"eibfs",
+"objective": {"target":"time(s)", "type": "min"},
+"robustness_fact": 90,
+"constraints": [
+    {"target": "CO2e(kg)", "type": "leq", "value": 0.1}
+],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"nodes", "value": 143000000},
+    {"name":"arcs", "value": 1000000000}
+], 
+"country": "Italy"}' localhost:5000/optimize
+
+curl -X POST -H 'Content-Type: application/json' -d ' 
+{"algorithm":"hpf",
+"objective": {"target":"time(s)", "type": "min"},
+"robustness_fact": null,
+"constraints": [
+    {"target": "CO2e(kg)", "type": "leq", "value": 0.1}
+],
+"prices": [
+    {"hw":"pc", "price": 100}
+],
+"inputs": [
+    {"name":"nodes", "value": 15000000},
+    {"name":"arcs", "value": 200000000}
 ], 
 "country": "Italy"}' localhost:5000/optimize
 
@@ -40,14 +86,14 @@ curl -X POST -H 'Content-Type: application/json' -d '
 "objective": {"target":"CO2e(kg)", "type": "min"},
 "robustness_fact": null,
 "constraints": [
-    {"target": "memPeak(MB)", "type": "leq", "value": 100}
+    {"target": "memPeak(MB)", "type": "leq", "value": 10}
 ],
 "prices": [
     {"hw":"pc", "price": 100}
 ],
 "inputs": [
-    {"name":"nodes", "value": 120},
-    {"name":"arcs", "value": 2000}
+    {"name":"nodes", "value": 300000},
+    {"name":"arcs", "value": 500000}
 ], 
 "country": "Italy"}' localhost:5000/optimize
 
