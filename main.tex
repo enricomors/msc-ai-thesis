@@ -32,7 +32,7 @@
 \session{5th}
 
 \frontispiece 
-\dedication{dedicated(X) :- friend(X).}
+\dedication{Dedicated to my Grandma}
 \toc
 \figstoc
 \tablestoc
@@ -194,7 +194,31 @@ are cleaner (e.g., renewable-powered grids) can significantly reduce $\mathsf{CO
 The development and adoption of these tracking tools play a crucial role in promoting sustainable AI research and deployment. 
 By quantifying emissions and identifying optimization strategies, these tools provide the foundation for a more environmentally 
 responsible approach to AI development.
- 
+
+\section{Hardware Optimization and Carbon-Efficient AI}
+
+A crucial aspect of AI sustainability research is optimizing hardware selection to balance performance and energy efficiency. 
+A recent study by Elgamal et al. (2023) \cite{elgamal2023carbon} provides a quantitative analysis of carbon-efficient AI computation, 
+focusing on extended reality (XR) systems and AI acceleration. The authors introduce Total Carbon-Delay Product (tCDP) as a 
+novel metric that integrates both execution time and carbon footprint, offering an alternative to traditional Energy-Delay Product (EDP) 
+in evaluating sustainable AI workloads. The paper's methodology combines real-device profiling and carbon modeling, measuring 
+AI workloads across multiple hardware platforms, including general-purpose CPUs, mobile SoCs, and specialized AI accelerators.
+
+Their results indicate that specialized AI accelerators tailored for specific workloads can reduce emissions by up to 10× compared 
+to general-purpose architectures. Additionally, they find that hardware over-provisioning—using more computational power than needed—leads 
+to significant carbon waste, suggesting that right-sizing hardware to workload demands could yield up to 21\% life-cycle carbon savings.
+
+These findings align with the research presented in this thesis. The HADA framework similarly seeks carbon-aware hardware selection, 
+analyzing multiple computing platforms, including HPC clusters and personal computing devices, to determine the most efficient configuration 
+for specific AI workloads. As observed in this work, selecting the appropriate hardware-software combination can lead to significant energy 
+savings, reinforcing Elgamal et al.'s conclusion that hardware specialization and workload profiling are key strategies for minimizing AI's 
+carbon footprint.
+
+However, a key distinction between the two works is in methodology. While Elgamal et al. uses analytical modeling to estimate carbon 
+impact—including both operational and embodied carbon emissions—the HADA-based approach relies on empirical measurement of live execution 
+data. This means that while the Elgamal et al. study projects future hardware optimizations, this work provides real-time insights into existing 
+hardware efficiency, making it immediately applicable to current AI deployment scenarios.
+
 \chapter{Methodology}
 
 \section{Empirical Model Learning in HADA} \label{EML-HADA}
@@ -268,8 +292,6 @@ The HADA framework follows a structured three-phase approach:
     the best combination of algorithmic and hardware configurations that meet the specified constraints while minimizing the 
     objective function (e.g., energy consumption or execution time).
 \end{enumerate}
-
-%TODO: explain also robustness coefficients (?)
 
 \subsection{Extending HADA for Energy and Carbon Footprint Optimization}
 
@@ -347,7 +369,7 @@ algorithm execution. This requires integrating \textbf{CodeCarbon} into the comp
 
 For this study, we analyzed two algorithms: \textbf{ANTICIPATE} and \textbf{CONTINGENCY}, originally introduced in 
 \cite{ijcai2019p150, 10.1007/978-3-319-93031-2_8} and previously used in the HADA framework paper \cite{DEFILIPPO2022109199}. 
-These algorithms belong to the domain of \textbf{Energy Management Systems} and are designed to compute the amount of energy 
+These algorithms belong to the domain of Energy Management Systems and are designed to compute the amount of energy 
 that must be generated to meet a required load while minimizing the total energy cost over a daily time horizon. Both methods
 consider the inherent uncertainty in energy demand and production.
 
@@ -607,7 +629,7 @@ energy consumption than CONTINGENCY, particularly on \verb|leonardo|, given that
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth]{imgs/energy_ant_cont.png}
+    \includegraphics[width=\textwidth]{imgs/energy_ant_cont.png}
     \caption{Energy consumption for ANTICIPATE and CONTINGENCY across different platforms.}
     \label{fig:ant_cont_energy}
 \end{figure}
@@ -667,7 +689,7 @@ marked the corresponding results as "none".
         \hline
         \multicolumn{2}{|c|}{Bounds} & \multicolumn{5}{c|}{Solution} \\
         \hline
-        Memory (MB) & Cost (k€) & $n^P$ & HW & CO$_2$ (kg) & Memory (MB) & Cost (k€) \\
+        Mem (MB) & Cost (k€) & $n^P$ & HW & CO$_2$ (kg) & Mem (MB) & Cost (k€) \\
         \hline
         no & no & 1 & mbp19 & $7.23 \times 10^{-6}$ & - & - \\
         80 & no & none & none & none & none & none \\
@@ -679,7 +701,7 @@ marked the corresponding results as "none".
         300 & $500$ & 1 & mbp19 & $7.23 \times 10^{-6}$ & $81.47$ & $368.73$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the ANTICIPATE algorithm with constraints on memory usage and solution cost.}
+    \caption{Experimental results for the ANTICIPATE algorithm with constraints on the Average Memory usage and Solution Cost.}
     \label{tab:anticipate_results}
 \end{table}
 
@@ -776,8 +798,8 @@ showed the highest correlation with emissions ($0.47$), we focused on determinin
         no & $350$ & 4 & mbp19 & $1.53 \times 10^{-6}$ & - & $338.23k$ \\
         10 & no & 2 & mbp19 & $1.29 \times 10^{-6}$ & $6.01$ & - \\
         10 & $320$ & none & none & none & none & none \\
-        60 & $350$ & 4 & mbp19 & $1.29 \times 10^{-6}$ & $7.68$ & $338.23k$ \\
-        120 & $320$ & 90 & mbp19 & $1.24 \times 10^{-5}$ & $119.47$ & $314.11k$ \\
+        60 & $350$ & 4 & mbp19 & $1.29 \times 10^{-6}$ & $7.68$ & $338.23$ \\
+        120 & $320$ & 90 & mbp19 & $1.24 \times 10^{-5}$ & $119.47$ & $314.11$ \\
         \hline
     \end{tabular}
     \caption{Experimental results for the CONTINGENCY algorithm with constraints on runtime and solution cost.}
@@ -916,7 +938,7 @@ a strong preference for smaller-scale hardware platforms, with PC and mbp19 bein
         143M & 1B & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$ & $9.79$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the BK algorithm}
+    \caption{Experimental results for the BK algorithm, with constraints on the runtime}
     \label{tab:bk_results}
 \end{table}
 
@@ -938,7 +960,7 @@ a strong preference for smaller-scale hardware platforms, with PC and mbp19 bein
         143M & 1B & $10$ & none & none & none & none \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the EIBFS algorithm}
+    \caption{Experimental results for the EIBFS algorithm, with constraints on the runtime}
     \label{tab:eibfs_results}
 \end{table}
 
@@ -948,7 +970,7 @@ a strong preference for smaller-scale hardware platforms, with PC and mbp19 bein
         \hline
         \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
         \hline
-        Nodes & Arcs & memPeak(MB) & Impl. & HW & CO2e & memPeak(MB) \\
+        Nodes & Arcs & Mem(MB) & Impl. & HW & CO2e & Mem(MB) \\
         \hline
         2.5k & 50k & $10$ & HPF-H-F & mbp19 & $2.11 \times 10^{-6}$ & $0.48$ \\
         10k & 75k & $10$ & HPF-H-F & mbp19 & $4.91 \times 10^{-7}$ & $0.46$ \\
@@ -961,18 +983,12 @@ a strong preference for smaller-scale hardware platforms, with PC and mbp19 bein
         125M & 300M & $4000$ & HPF-L-F & mbp19 & $9.08 \times 10^{-3}$ & $3785.29$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the EIBFS algorithm}
+    \caption{Experimental results for the HPF algorithm, with constraints on peak memory consumption}
     \label{tab:hpf_results}
 \end{table}
 
 Similar trends were observed for EIBFS and HPF, as shown in Tables \ref{tab:eibfs_results} and \ref{tab:hpf_results}. When CO$_2$ emissions were minimized, the computationally
-lighter hardware architectures were consistently preferred. This result can be attributed to the following factors:
-
-\begin{itemize}
-    \item Smaller architectures tend to have lower power consumption per computation unit, making them more efficient in terms of emissions when processing relatively small to mid-sized problem instances.
-    \item High-performance computing (HPC) systems like Leonardo introduce computational overhead, which increases overall energy consumption, especially when handling smaller problem instances.
-    \item The serial nature of the tested algorithm implementations does not exploit the parallelism of the HPC architecture, leading to underutilization of available resources.
-\end{itemize}
+lighter hardware architectures were consistently preferred. 
 
 \paragraph{Optimization for Runtime Minimization}
 
@@ -1060,10 +1076,11 @@ From the results obtained, we observe that even when optimizing for runtime, HAD
 \begin{itemize}
     \item Sequential Algorithm Implementations: the versions of BK, EIBFS, and HPF tested in this study were single-threaded, meaning they do not take advantage of parallel 
     processing capabilities offered by HPC clusters. As highlighted by Jensen et al. \cite{Jensen2023Maxflow}, specialized parallel implementations of max-flow algorithms exist, 
-    and these would likely benefit more from HPC architectures.
+    and these would likely benefit more from HPC architectures. Then, neither the Min-Cut/Max-Flow algorithms nor the energy management algorithms rely on the use of GPUs, 
+    which tipycally can create a large speedup. So, again, we did not have the settings to exploit the full potential of an HPC cluster.
     \item Computational Overhead in HPC systems: HPC environments like Leonardo introduce additional computational overhead due to factors such as job scheduling, data transfer, 
     and process management. For small and medium-sized instances, this overhead can negate the potential runtime benefits, leading to comparable or even worse performance compared 
-    to commodity hardware.
+    to commodity hardware. %TODO: incorporate observations 
 \end{itemize}
 
 \chapter{HADA-as-a-Service}
@@ -1194,26 +1211,46 @@ Below is an example JSON structure:
 }
 \end{verbatim}
 
-This approach allows HADA to seamlessly integrate new datasets, expanding its optimization capabilities to additional algorithms and hardware platforms.
+This approach allows HADA to seamlessly integrate new datasets, expanding its optimization capabilities to additional algorithms and hardware platforms. So, when data about the carbon
+emissions or energy consumption of an algoritm, executed on different hardware platforms with different configurations, are available, they can be integrated in HADA. This could be 
+very useful for choosing the optimal hardware architecture and algoritm configuration to minimize carbon emissions.
 
 \chapter{Conclusions}
 
-This work extends HADA by integrating carbon emission constraints, enhancing its applicability 
-for sustainable AI hardware selection, taking into account the carbon footprint of computation. 
-In the experimental analysis section we tested the capability of HADA in choosing the best configuration of algorithm parameter and hardware architecture to meet the requirements 
-expressed by the user, with the help of the HADA web service. 
+This research encountered several challenges, both technical and logistical, throughout its development. One of the primary obstacles was executing the ANTICIPATE and CONTINGENCY 
+algorithms on the Leonardo HPC infrastructure. These algorithms rely on the Gurobi solver, which requires a valid license. However, due to system constraints, it was not possible to 
+install the license directly on the compute nodes. To overcome this issue, it was necessary to coordinate with Gurobi's support team to obtain a Floating Academic License, which was 
+subsequently installed on the CINECA License Server. This additional step introduced delays but ultimately enabled the successful execution of the algorithms on Leonardo.
 
-From the results obtained from the experiments, it is evident that platform selection plays a critical role in emissions optimization. Higher performance platforms like
-leonardo could be beneficial when the superior computational power brings significant improvements in the algorithm runtime. Usage of HPC architectures like leonardo could be convenient to 
-perform heavy parallel compuations, expecially with runtime constraints, or when the problem size requires more memory. For light or moderate workloads, with little to no parallelization, expecially
-when energy efficiency is the main focus, one should stick with smaller architectures. 
+Another significant challenge arose during the benchmarking phase of the Min-Cut/Max-Flow algorithms. The process involved managing a vast number of problem instances, many of which 
+were extremely large, often reaching several gigabytes in size. Conducting experiments on multiple platforms required careful data management, computational resource allocation, and 
+execution scheduling to ensure consistency across different architectures. Furthermore, systematically collecting, processing, and organizing the results into a structured dataset 
+proved to be a highly time-consuming task. The need to execute these experiments on two distinct hardware platforms (Leonardo HPC and a personal workstation) added complexity, 
+requiring careful tracking of execution conditions, runtime behavior, and performance variations.
+
+Despite these challenges, this work successfully extended the HADA framework by integrating energy consumption and carbon footprint metrics using CodeCarbon. The experimental analysis 
+provided valuable insights into the impact of hardware selection on computational efficiency, revealing that smaller-scale architectures (such as personal computers and laptops) tend
+to be more energy-efficient for many of the tested workloads. However, the results also highlighted cases where HPC architectures like Leonardo could be preferable, particularly for 
+large-scale problem instances, which exceeds the memory capacity of common devices. Moreover, the benchmark phase on Min-Cut/Max-Flow problems showed that the algorithms tested are 
+very well optimized, so that they can achieve pretty good performances also on common devices, and this highligts the importance of efficient algorithm development for sustainability.
+Additionally, this research underscores the importance of energy-aware computing and highlights how hardware selection, algorithm design, and execution environment can significantly 
+influence the carbon footprint of computational tasks. The findings reinforce the potential for machine learning-driven optimization frameworks like HADA to assist in making informed 
+decisions regarding computational resource usage, balancing trade-offs between runtime, memory consumption, energy efficiency, and emissions. Future work could explore further enhancements, such as integrating parallel Min-Cut/Max-Flow algorithms that could better leverage HPC architectures, refining the machine learning 
+models used by HADA, or incorporating real-time carbon intensity data to dynamically optimize execution strategies based on current energy conditions. Expanding the benchmark dataset 
+with additional algorithms and hardware configurations could further improve the accuracy and generalizability of HADA's optimization capabilities.
+By addressing these challenges and proposing potential solutions, this study contributes to the broader effort of making computational research more sustainable, efficient, and 
+environmentally conscious.
 
 \appendix
 
 \printbibliography[heading=bibintoc] % biblatex
 
-\acknowledgements
-I'm very grateful to the inventor of the Prolog language, without whom this thesis couldn't exist. I'd also like 
-to acknowledge my advisor Prof. Mario Rossi by tail-recursively acknowledging my advisor.
-	
+\acknowledgements  
+I would like to express my deepest gratitude to my supervisors, Andrea Borghesi and Allegra De Filippo, for their invaluable guidance, support, and encouragement throughout 
+the development of this work. Their insights and expertise have been instrumental in shaping this research, and their contributions to the HADA framework provided the foundation 
+upon which this study was built.  
+
+I am also profoundly grateful to my family and friends for their unwavering support, patience, and encouragement throughout this long journey. Their belief in me has been a 
+constant source of motivation, and this achievement would not have been possible without them.  
+
 \end{document}
