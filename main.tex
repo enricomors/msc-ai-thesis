@@ -589,7 +589,7 @@ presents a comparative analysis of their environmental impact across different h
 
 \subsubsection{Carbon Emissions Analysis}
 
-Figure \ref{fig:ant_cont_emissions} displays the carbon emissions for ANTICIPATE and CONTINGENCY, categorized by hardware platform. The data reveals that emissions tend to be higher for the 
+Figure~\ref{fig:ant_cont_emissions} displays the carbon emissions for ANTICIPATE and CONTINGENCY, categorized by hardware platform. The data reveals that emissions tend to be higher for the 
 ANTICIPATE algorithm, particularly when executed on the \verb|leonardo| platform. Overall, the measured values remain relatively small, except for one notable outlier exceeding 0.020 kg of 
 $\mathsf{CO_2e}$. Most emission values fall within the range $[0,0.005]$ kg.
 
@@ -602,7 +602,7 @@ $\mathsf{CO_2e}$. Most emission values fall within the range $[0,0.005]$ kg.
 
 \subsubsection{Energy Consumption Analysis}
 
-Similarly, Figure \ref{fig:ant_cont_energy} illustrates the energy consumption for ANTICIPATE and CONTINGENCY. The overall trend aligns with the emissions data, with ANTICIPATE exhibiting higher 
+Similarly, Figure~\ref{fig:ant_cont_energy} illustrates the energy consumption for ANTICIPATE and CONTINGENCY. The overall trend aligns with the emissions data, with ANTICIPATE exhibiting higher 
 energy consumption than CONTINGENCY, particularly on \verb|leonardo|, given that carbon emissions are directly proportional to energy usage in the absence of variation in Carbon Intensity.
 
 \begin{figure}[h!]
@@ -614,10 +614,10 @@ energy consumption than CONTINGENCY, particularly on \verb|leonardo|, given that
 
 \subsubsection{Correlation Analysis}
 
-To further investigate the factors influencing emissions and energy consumption, Figures \ref{fig:ant_corr_mat} and \ref{fig:cont_corr_mat} present the correlation matrices for ANTICIPATE and 
+To further investigate the factors influencing emissions and energy consumption, Figure~\ref{fig:ant_corr_mat} and Figure~\ref{fig:cont_corr_mat} present the correlation matrices for ANTICIPATE and 
 CONTINGENCY, respectively.
 
-For ANTICIPATE (Figure \ref{fig:ant_corr_mat}), the variable exhibiting the highest correlation with carbon emissions, aside from direct energy consumption, is the \textbf{average memory usage}, 
+For ANTICIPATE (Figure~\ref{fig:ant_corr_mat}), the variable exhibiting the highest correlation with carbon emissions, aside from direct energy consumption, is the \textbf{average memory usage}, 
 with a correlation coefficient of $0.93$. This suggests that higher memory consumption is a key contributor to increased emissions. Additionally, CPU energy consumption and RAM energy consumption 
 both exhibit strong correlations with emissions, further reinforcing the relationship between computational resource usage and environmental impact.
 
@@ -628,7 +628,7 @@ both exhibit strong correlations with emissions, further reinforcing the relatio
     \label{fig:ant_corr_mat}
 \end{figure}
 
-In contrast, for CONTINGENCY (Figure \ref{fig:cont_corr_mat}), there are no particularly strong linear correlations between emissions and other performance metrics. The highest correlation with 
+In contrast, for CONTINGENCY (Figure~\ref{fig:cont_corr_mat}), there are no particularly strong linear correlations between emissions and other performance metrics. The highest correlation with 
 emissions is observed for \textbf{execution time} ($0.36$), indicating that longer runtimes slightly contribute to higher emissions. However, the overall relationships appear weaker compared 
 to ANTICIPATE, suggesting that CONTINGENCY’s energy usage is less dependent on a single dominant factor.
 
@@ -685,12 +685,12 @@ marked the corresponding results as "none".
 
 The results indicate that in most cases, minimizing CO$_2$ emissions aligns with minimizing memory consumption. The smallest emissions were observed when HADA selected configurations with fewer
 scenarios ($n^P$). This is consistent with our earlier observations, where ANTICIPATE's carbon footprint was highly correlated with memory usage ($0.93$ correlation). We can also observe how
-for tighter solution cost bounds, the numbber of scenarios tends to increase (reflecting the negative correlation of $-0.88$ as we can see in \ref{fig:ant_corr_mat}), and since increasing the 
+for tighter solution cost bounds, the numbber of scenarios tends to increase (reflecting the negative correlation of $-0.88$ as we can see in Figure~\ref{fig:ant_corr_mat}), and since increasing the 
 number of scenarios means more memory usage, the carbon emissions also grows. When the solution cost is allowed to be higher, the number of scenarios is instead kept as low as possible, given
 that we are trying to minimize the CO$_2$ emissions. Thus, in the case of ANTICIPATE we have a trade-off between CO$_2$ emissions and Solution cost.
 
 A notable outcome is that, when trying to minimize the emissions HADA always selected the mbp19 platform. This suggests that the additional computational power offered by leonardo comes with an
-higher energy cost, as shown by \ref{fig:ant_cont_emissions} and \ref{fig:ant_cont_energy}, so that, when the focus is on minimizing the CO$_2$ emissions mbp19 seems to be the "greener" choice.
+higher energy cost, as shown by Figure~\ref{fig:ant_cont_emissions} and Figure~\ref{fig:ant_cont_energy}, so that, when the focus is on minimizing the CO$_2$ emissions mbp19 seems to be the "greener" choice.
 The advanges of using leonardo may come instead from the reduced runtimes.
 
 \begin{figure}[h!]
@@ -788,7 +788,7 @@ The results for CONTINGENCY further reinforce the platform selection pattern see
 \ref{fig:time_comparison}, that CONTINGENCY runs significantly slower on Leonardo than on mbp19. By looking at the dataset, we can see that Leonardo incurred a large overhead ($\approx60$s) 
 even for a single trace, whereas mbp19 handled one trace in $5$-$6$s. This trend continued as traces increased, as with 100 traces, mbp19 has runtimes around 140 seconds, while leonardo runtime
 values are around 800 seconds. Thus, contrary to what happened with ANTICIPATE, with CONTINGENCY using leonardo did not brought any significant advantage in performance. Even by looking at the
-memory consumption we can see that mbp19 outperforms leonardo(\ref{fig:mem_usage_comparison}), with actually no visible gains in terms of solution cost, as we can see by \ref{fig:cost_comparison}. 
+memory consumption we can see that mbp19 outperforms leonardo(\ref{fig:mem_usage_comparison}), with actually no visible gains in terms of solution cost, as we can see by Figure~\ref{fig:cost_comparison}. 
 
 \begin{figure}[h!]
     \centering
@@ -809,7 +809,7 @@ memory consumption we can see that mbp19 outperforms leonardo(\ref{fig:mem_usage
 \subsection{Min-Cut/Max-Flow Algorithms}
 
 In this section, we analyze the performance and environmental impact of Min-Cut/Max-Flow algorithms and discuss the results obtained from tests performed using the HADA framework. 
-These algorithms play a crucial role in various optimization problems, particularly in computer vision and network flow applications. Figure \ref{fig:max_flow_emissions} presents an 
+These algorithms play a crucial role in various optimization problems, particularly in computer vision and network flow applications. Figure~\ref{fig:max_flow_emissions} presents an 
 overview of the CO$_2$ emissions for the three Min-Cut/Max-Flow algorithms tested. It is evident that the vast majority of configurations emitted less than 0.001 kg of CO$_2$, 
 similar to trends observed for the ANTICIPATE and CONTINGENCY algorithms.
 
@@ -879,12 +879,12 @@ EIBFS, and HPF, respectively.
     \label{fig:hpf_flow_corr_mat}
 \end{figure}
 
-For both BK and EIBFS, runtime exhibits the strongest correlation with CO$_2$ emissions. In \ref{fig:bk_orr_mat}, we observe that execution time has a correlation of approximately
+For both BK and EIBFS, runtime exhibits the strongest correlation with CO$_2$ emissions. In Figure~\ref{fig:bk_orr_mat}, we observe that execution time has a correlation of approximately
 $0.99$ with energy consumption and emissions, indicating that the longer an algorithm runs, the more energy it consumes, which directly translates into higher emissions. This trend 
 is similarly observed in EIBFS (\ref{fig:eibfs_corr_mat}), reinforcing that for these algorithms, minimizing runtime is the most effective way to reduce emissions. Given this insight, 
 we will assess how BK and EIBFS behave when constraints on runtime are introduced, particularly when minimizing CO$_2$ emissions.
 
-HPF, on the other hand, demonstrates a slightly different behavior. From Figure \ref{fig:hpf_flow_corr_mat}, we can see that the strongest correlation with CO$_2$ emissions is memory usage, 
+HPF, on the other hand, demonstrates a slightly different behavior. From Figure~\ref{fig:hpf_flow_corr_mat}, we can see that the strongest correlation with CO$_2$ emissions is memory usage, 
 specifically peak memory usage (memPeak) and average memory usage (memAvg), both exceeding 0.93. This suggests that rather than runtime alone, memory allocation plays a significant 
 role in determining the carbon footprint of HPF. For this reason, in the experiments on HPF we impose constraints on peak memory usage rather than runtime.
 
@@ -1105,7 +1105,7 @@ When the optimization starts, the HADA backend performs the following steps:
     \item Solving the Optimization Model: The mathematical model, including user-defined constraints, is passed to IBM CPLEX, which attempts to find an optimal solution.
 \end{itemize}
 
-An example of an optimization request sent through the HADA GUI is depicted in \ref{fig:hada_optimisation_req}.
+An example of an optimization request sent through the HADA GUI is depicted in Figure~\ref{fig:hada_optimisation_req}.
 
 \begin{figure}[h!]
     \centering
@@ -1130,7 +1130,7 @@ According to Our World in Data \cite{ember2024carbonintensity}, Turkmenistan had
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\textwidth]{imgs/hada-solution-turkmenistan.png}
-    \caption{Solution provided for the same constraint as in \ref{fig:hada_optimisation_req}, but this time selecting "Turkmenistan" as "Country"}
+    \caption{Solution provided for the same constraint as in Figure~\ref{fig:hada_optimisation_req}, but this time selecting "Turkmenistan" as "Country"}
     \label{fig:hada_solution_turkmenistan}
 \end{figure}
 
@@ -1199,14 +1199,14 @@ This approach allows HADA to seamlessly integrate new datasets, expanding its op
 \chapter{Conclusions}
 
 This work extends HADA by integrating carbon emission constraints, enhancing its applicability 
-for sustainable AI hardware selection. Through experimental benchmarks on laptops and HPC systems, 
-we validated the framework’s ability to balance performance and environmental impact. The web-based prototype 
-enables users to make informed decisions when configuring AI workloads under sustainability constraints.
+for sustainable AI hardware selection, taking into account the carbon footprint of computation. 
+In the experimental analysis section we tested the capability of HADA in choosing the best configuration of algorithm parameter and hardware architecture to meet the requirements 
+expressed by the user, with the help of the HADA web service. 
 
-From the results obtained in both ANTICIPATE and CONTINGENCY experiments, it is evident that platform selection plays a critical role in emissions optimization. Higher performance platforms like
+From the results obtained from the experiments, it is evident that platform selection plays a critical role in emissions optimization. Higher performance platforms like
 leonardo could be beneficial when the superior computational power brings significant improvements in the algorithm runtime. Usage of HPC architectures like leonardo could be convenient to 
 perform heavy parallel compuations, expecially with runtime constraints, or when the problem size requires more memory. For light or moderate workloads, with little to no parallelization, expecially
-when energy efficiency is the main focus, one should stick with smaller architectures.
+when energy efficiency is the main focus, one should stick with smaller architectures. 
 
 \appendix
 
