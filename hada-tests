@@ -60,8 +60,8 @@ curl -X POST -H 'Content-Type: application/json' -d '
     {"hw":"pc", "price": 100}
 ],
 "inputs": [
-    {"name":"nodes", "value": 143000000},
-    {"name":"arcs", "value": 1000000000}
+    {"name":"nodes", "value": 18900002},
+    {"name":"arcs", "value": 93749846}
 ], 
 "country": "Italy"}' localhost:5000/optimize
 

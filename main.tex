@@ -935,7 +935,6 @@ a strong preference for smaller-scale hardware platforms, with PC and mbp19 bein
         44k & 784k & $5$ & MBK2 & pc & $6.46 \times 10^{-6}$ & $1.39$ \\
         185k & 5M & $5$ & MBK2 & pc & $2.16 \times 10^{-6}$ & $0.28$ \\
         18M & 93M & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$& $9.79$ \\
-        143M & 1B & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$ & $9.79$ \\
         \hline
     \end{tabular}
     \caption{Experimental results for the BK algorithm, with constraints on the runtime}
@@ -956,11 +955,10 @@ a strong preference for smaller-scale hardware platforms, with PC and mbp19 bein
         10k & 62k & $0.1$ & EIBFS old & pc & $4.40 \times 10^{-7}$ & $2.89 \times 10^{-3}$ \\
         44k & 784k & $0.5$ & EIBFS new & pc & $8.7 \times 10^{-7}$ & $0.27$ \\
         185k & 5M & $0.5$ & EIBFS new2 & pc & $1.30 \times 10^{-6}$ & $0.12$ \\
-        18M & 93M & $5$ & EIBFS new & pc & $1.98 \times 10^{-5}$& $3.51$ \\
-        143M & 1B & $10$ & none & none & none & none \\
+        3M & 23M & $5$ & EIBFS new & pc & $1.98 \times 10^{-5}$& $3.51$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the EIBFS algorithm, with constraints on the runtime}
+    \caption{Experimental results for the EIBFS algorithm, minimising CO$_2$ emissions with constraints on the runtime}
     \label{tab:eibfs_results}
 \end{table}
 
@@ -1003,17 +1001,17 @@ and HPF are presented in Tables \ref{tab:bk_results_time}, \ref{tab:eibfs_result
         \hline
         Nodes & Arcs & CO2e(kg) & Impl. & HW & CO2e & time(s) \\
         \hline
-        40 & 400 & $0.1$ & MBK2 & pc & $4.38 \times 10^{-7}$ & $3.81 \times 10^{-5}$ \\
-        120 & 2k & $0.1$ & MBK2 & pc & $4.40 \times 10^{-7}$ & $5.10 \times 10^{-5}$ \\
-        1k & 5k & $0.1$ & MBK & leonardo & $4.40 \times 10^{-7}$ & $1.10 \times 10^{-4}$ \\
-        10k & 62k & $0.1$ & MBK & leonardo & $4.40 \times 10^{-7}$ & $2.32 \times 10^{-3}$ \\
+        40 & 400 & $0.001$ & MBK2 & pc & $4.38 \times 10^{-7}$ & $3.81 \times 10^{-5}$ \\
+        120 & 2k & $0.001$ & MBK2 & pc & $4.40 \times 10^{-7}$ & $5.10 \times 10^{-5}$ \\
+        1k & 5k & $0.001$ & MBK & leonardo & $4.40 \times 10^{-7}$ & $1.10 \times 10^{-4}$ \\
+        10k & 62k & $0.001$ & MBK & leonardo & $4.40 \times 10^{-7}$ & $2.32 \times 10^{-3}$ \\
         16k & 111k & $0.1$ & MBK & leonardo & $4.44 \times 10^{-5}$ & $1.37$ \\
         44k & 784k & $0.1$ & MBK2 & leonardo & $2.63 \times 10^{-6}$ & $0.88$ \\
-        185k & 5M & $5$ & MBK2 & pc & $2.16 \times 10^{-6}$ & $0.28$ \\
-        18M & 93M & $10$ & MBK2 & pc & $4.69 \times 10^{-5}$& $9.79$ \\
+        185k & 5M & $0.1$ & MBK2 & pc & $2.16 \times 10^{-6}$ & $0.28$ \\
+        3M & 23M & $0.1$ & MBK2 & leonardo & $9.53 \times 10^{-5}$& $2.67$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the BK algorithm}
+    \caption{Experimental results for the BK algorithm, minimizing runtime and bounding CO$_2$ emissions}
     \label{tab:bk_results_time}
 \end{table}
 
@@ -1027,7 +1025,7 @@ seconds on Leonardo.
         \hline
         \multicolumn{3}{|c|}{Inputs \& Bound} & \multicolumn{4}{c|}{Solution} \\
         \hline
-        Nodes & Arcs & time(s) & Impl. & HW & CO2e & time(s) \\
+        Nodes & Arcs & CO2(kg) & Impl. & HW & CO2e & time(s) \\
         \hline
         40 & 400 & $0.1$ & EIBFS new2 & leonardo & $3.01 \times 10^{-6}$ & $1.37 \times 10^{-5}$ \\
         120 & 2k & $0.1$ & EIBFS new2 & leonardo & $3.01 \times 10^{-6}$ & $7.22 \times 10^{-5}$ \\
@@ -1035,11 +1033,10 @@ seconds on Leonardo.
         10k & 62k & $0.1$ & EIBFS new2 & leonardo & $4.40 \times 10^{-6}$ & $1.72 \times 10^{-3}$ \\
         44k & 784k & $0.1$ & EIBFS new2 & leonardo & $9.27 \times 10^{-6}$ & $0.02$ \\
         185k & 5M & $0.1$ & EIBFS new2 & leonardo & $8.80 \times 10^{-6}$ & $0.09$ \\
-        18M & 93M & $5$ & EIBFS new & pc & $1.98 \times 10^{-5}$& $3.51$ \\
-        143M & 1B & $10$ & none & none & none & none \\
+        3M & 23M & $0.1$ & EIBFS new & leonardo & $8.24 \times 10^{-5}$& $2.19$ \\
         \hline
     \end{tabular}
-    \caption{Experimental results for the EIBFS algorithm}
+    \caption{Experimental results for the EIBFS algorithm, minimising runtime, with bounds on CO$_2$ emissions}
     \label{tab:eibfs_results_runtime}
 \end{table}
 
